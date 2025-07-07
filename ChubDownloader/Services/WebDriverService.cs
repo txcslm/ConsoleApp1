@@ -8,27 +8,32 @@ namespace ChubDownloader.Services
     {
         private readonly ChromeDriver _driver;
         private readonly string _mainWindowHandle;
+        private static int _debugPort = 9222; 
         
         public IWebDriver Driver => _driver;
         
         public WebDriverService(string downloadPath)
         {
             var options = new ChromeOptions();
+            
             options.AddArgument("--user-data-dir=/Users/txcslm/chub_followers_profile");
-            options.AddArgument("--disable-gpu");
-            options.AddArgument("--window-size=1920,1080");
-            options.AddArgument("--disable-blink-features=AutomationControlled");
-            options.AddArgument("--disable-dev-shm-usage");
+            
+            options.AddArgument($"--remote-debugging-port={_debugPort++}"); // Инкрементируем порт для каждого экземпляра
+            options.AddArgument("--remote-allow-origins=*");
+            
+            options.AddArgument("--disable-backgrounding-occluded-windows");
+            options.AddArgument("--disable-renderer-backgrounding");
+            options.AddArgument("--disable-background-timer-throttling");
+            
+            options.AddArgument("--dns-prefetch-disable");
             options.AddArgument("--no-sandbox");
+            options.AddArgument("--disable-dev-shm-usage");
+            options.AddArgument("--disable-gpu");
             
-            options.AddArgument("--no-first-run");
-            options.AddArgument("--no-default-browser-check");
-            options.AddArgument("--disable-popup-blocking");
+            options.AddArgument("--disable-blink-features=AutomationControlled");
             
-            if (OperatingSystem.IsMacOS())
-            {
-                options.AddArgument("--start-minimized");
-            }
+            options.AddArgument("--window-size=1280,800");
+            options.AddArgument("--window-position=100,100");
             
             options.AddUserProfilePreference("download.default_directory", downloadPath);
             options.AddUserProfilePreference("download.prompt_for_download", false);
@@ -42,12 +47,6 @@ namespace ChubDownloader.Services
             _driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(15);
             
             _mainWindowHandle = _driver.CurrentWindowHandle;
-            
-            // Устанавливаем позицию окна чтобы оно не мешало
-            _driver.Manage().Window.Position = new System.Drawing.Point(0, 0);
-            
-            // Опционально: можно сделать окно меньше
-            // _driver.Manage().Window.Size = new System.Drawing.Size(1024, 768);
         }
         
         public void NavigateTo(string url)
@@ -57,12 +56,16 @@ namespace ChubDownloader.Services
         
         public void OpenNewTab(string url)
         {
-            // Открываем вкладку без фокуса
             ((IJavaScriptExecutor)_driver).ExecuteScript($@"
-                var newTab = window.open('{url}', '_blank');
-                newTab.blur();
-                window.focus();
+                const link = document.createElement('a');
+                link.href = '{url}';
+                link.target = '_blank';
+                link.rel = 'noopener';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             ");
+            
         }
         
         public void SwitchToLastTab()

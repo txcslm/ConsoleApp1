@@ -16,7 +16,7 @@ namespace ChubDownloader.Services
         {
             var options = new ChromeOptions();
             
-            options.AddArgument("--user-data-dir=userPath");
+            options.AddArgument($"--user-data-dir={userPath}");
             
             options.AddArgument($"--remote-debugging-port={_debugPort++}"); // Инкрементируем порт для каждого экземпляра
             options.AddArgument("--remote-allow-origins=*");

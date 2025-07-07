@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ChubDownloader")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1f11272c87bb51611b41c807375c709a7601c581")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f17f8dc75c946ccbee3f76526a111e3563c21aed")]
 [assembly: System.Reflection.AssemblyProductAttribute("ChubDownloader")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ChubDownloader")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

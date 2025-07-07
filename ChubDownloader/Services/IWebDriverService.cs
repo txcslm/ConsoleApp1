@@ -14,9 +14,4 @@ namespace ChubDownloader.Services
     IWebElement FindElement(By by);
     IReadOnlyCollection<IWebElement> FindElements(By by);
   }
-  
-  namespace ChubDownloader.Services
-{
-}
-
 }

@@ -36,6 +36,13 @@ public class DownloadService : IDownloadService
           if (size1 == size2 && size1 > 0)
           {
             var destFile = Path.Combine(targetPath, characterId + extension);
+            
+            if (CharacterExistsInAnyFolder(targetPath, characterId, extension))
+            {
+              Console.WriteLine($"[DUPLICATE] Character {characterId} already exists. Skipping download.");
+              return false;
+            }
+
             File.Move(sourceFile.FullName, destFile, true);
             return true;
           }
@@ -51,6 +58,13 @@ public class DownloadService : IDownloadService
       return false;
     }
   }
+
+  private static bool CharacterExistsInAnyFolder(string rootPath, string characterId, string extension)
+  {
+    var files = Directory.GetFiles(rootPath, $"*{extension}", SearchOption.AllDirectories);
+    return files.Any(file => Path.GetFileNameWithoutExtension(file).Equals(characterId, StringComparison.OrdinalIgnoreCase));
+  }
+
         
   public void ClearOldFiles(string path, string extension)
   {

@@ -1,6 +1,5 @@
 using ChubDownloader.Models;
 using ChubDownloader.Services;
-using ChubDownloader.Services.ChubDownloader.Services;
 using ChubDownloader.Views;
 
 namespace ChubDownloader.Presenters

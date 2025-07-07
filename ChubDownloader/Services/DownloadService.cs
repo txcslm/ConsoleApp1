@@ -79,7 +79,7 @@ namespace ChubDownloader.Services
         {
             try
             {
-                var charactersPath = Path.Combine(rootPath, CharactersFolderName);
+                var charactersPath = Path.Combine(rootPath);
                 if (!Directory.Exists(charactersPath))
                     return;
 

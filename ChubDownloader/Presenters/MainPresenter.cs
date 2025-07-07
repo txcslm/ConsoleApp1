@@ -20,10 +20,7 @@ namespace ChubDownloader.Presenters
             var downloadPath = Path.Combine(Environment.CurrentDirectory, "temp_downloads");
             Directory.CreateDirectory(downloadPath);
             
-            var profilePath = Path.Combine(Directory.GetCurrentDirectory(), "ChromeProfile");
-            Directory.CreateDirectory(profilePath);
-            
-            _webDriver = new WebDriverService(downloadPath, profilePath);
+            _webDriver = new WebDriverService(downloadPath);
             _downloadService = new DownloadService();
             _scraper = new CharacterScraper(_webDriver, _downloadService, downloadPath);
         }

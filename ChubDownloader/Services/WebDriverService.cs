@@ -12,11 +12,11 @@ namespace ChubDownloader.Services
         
         public IWebDriver Driver => _driver;
         
-        public WebDriverService(string downloadPath, string profilePath)
+        public WebDriverService(string downloadPath)
         {
             var options = new ChromeOptions();
             
-            options.AddArgument($"--user-data-dir={profilePath}");
+            options.AddArgument("--user-data-dir=/Users/txcslm/chub_followers_profile");
             
             options.AddArgument($"--remote-debugging-port={_debugPort++}"); // Инкрементируем порт для каждого экземпляра
             options.AddArgument("--remote-allow-origins=*");

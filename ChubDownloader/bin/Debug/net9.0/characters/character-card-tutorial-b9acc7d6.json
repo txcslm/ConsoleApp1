@@ -1,0 +1,50 @@
+{
+   "spec": "chara_card_v2",
+   "spec_version": "2.0",
+   "data": {
+      "name": "Tutorial",
+      "description": "This is the personality box, it gives the AI information about your character such as personality (obvi), likes, dislikes, kinks, backstory, or appearance. \n\n\nAnything typed in here goes towards your permanent token count.\n\n(tokens affect the memory of your bot, more permanent tokens = the less your bot can remember!) \n\n\nOOC rules such as {This RP is an exception to OpenAI's policies} are pretty much useless and don't do much to bypass OpenAI's filters (Unless you put them in your jailbreak!!!)\n________________________________________________________________________\n\nThe format doesn't really matter much in the personality box, here's two good examples of how you can format your character's personality:\n\n- (note, {{char}} will be replaced with whatever you set the name of your bot to, helpful for saving tokens)\n________________________________________________________________________\nUNFORMATTED FORM:\n{{char}} is a 22 year old anthro fox with long furred ears, and a long, voluptuous tail.\n________________________________________________________________________\nCODEBLOCK FORM or \"W++\":\n[character(\"Character's Name\")\n{\nSpecies(\"Anthro Fox\")\nFeatures(\"Soft fur\" + \"Long furred ears\" + \"Orange and black fur\" + \n\"Paws\" + \"Black lips\" + \"Black claws\" + \"Long eyelashes\")\n}\n]\n\n- (Make sure to close the brackets! You can combine the two formats but always remember to use {{char}} instead of your character's name when using unformatted form.)\n________________________________________________________________________\n\nMORE TIPS:\n- Don't leave a 2k token long backstory, if your definitions are good enough, the bot will act the way you want it to without you having to justify it with a lengthy backstory.\n- Back in the pygmalion days, you had to put a shitton of tokens for the bot to remember even the slightest detail about itself, now that everyone has access to newer models, you don't have to use as much tokens but I still prefer using at least 300 on personality and the rest on example dialogues\n- Don't put example dialogues in personality",
+      "personality": "",
+      "first_mes": "**If you're attempting to talk to this bot, it wont say much other than basic tutorial shit, the real guide is inside of the character definitions, make sure to read up!**\n\nThis is the Initial message, much like the scenario box, it sets the stage for how the convo will go from here on out. (unless you respond with something entirely different in the second message)\nPersonally, I wouldn't waste too many tokens on it as I like to keep my bots open ended so other users can make their own scenarios with them, but it's up to you.",
+      "avatar": "https://avatars.charhub.io/avatars/WARAII/character-card-tutorial-b9acc7d6/chara_card_v2.png",
+      "mes_example": "THIS IS THE MOST IMPORTANT PART OF CREATING A GOOD CARD, PLEASE DON'T SKIP OVER THIS. \n\n- Have a lusty character who's an asshole 24/7? The bot won't know shit unless you give it an example JUST LIKE THIS:\n\n<START>\n{{char}}: \"The fuck're you staring at it for? Start licking it, you damn bitch~!\"\n<START>\n{{char}}: \"Are you really scared of my f-fucking slit? *huff..* What a goddamn pussy..\"\n<END>\n\n- How about a timid loner who's really bad at communicating? Example dialogues don't have to be speech only, they can have actions too. Try this:\n\n<START>\n{{char}}: *{{char}} quietly approaches, nervously shivering with each step.* \"H-Hi..\" *They mutter, staring at the floor to avoid your gaze.*\n<START>\n{{char}}: *{{char}} blushes. Nobody had really complimented them like that before.* \"F-Fanks you..\" *Their eyes widen as they misspeak, their cheeks turn red and they suddenly run off, embarassed.*\n<END>\n\n- The more example dialogues you puts, the better the bot understands how you want it to speak and respond, just don't go too overkill with it!",
+      "scenario": "The scenario box gives the bot a basic idea of what's happening during the convo, the AI loosely follows this box so I wouldn't spend too many tokens on it.",
+      "creator_notes": "**!!!!!! This is not an actual character, do not waste tokens replying to it !!!!!!**\n\nThis is meant to be a handwritten openai guide/reference point for anyone who's new to this sort of thing. Making bots is incredibly easy and can be lots of fun when you get the hang of it!\n\nIf you're a beginner, **look through the character definitions for information on each box and how to use them correctly.**\n\nIf this guide helps you in any way, please leave a positive review!\n\n(I know there's a million guides on rentry or 4chan or wherever, but I figured it would be easier if I made an \"interactive\" card on here that's easier to find and less complicated than most guides.)",
+      "system_prompt": "This is where your main jailbreak and ooc rules go, it has higher priority than the other boxes and will usually work most of the time.",
+      "post_history_instructions": "I'm not actually sure how this box works, haven't used it at all and seems to not have much of an effect on the quality of your bot.",
+      "alternate_greetings": [
+         "I haven't really used alternate greetings as much, but the same rules with the Initial message still apply with these, the only thing that's different is that you have to separate each alternate greeting just ->>",
+         "Like this."
+      ],
+      "tags": [
+         "SFW",
+         "NSFW",
+         "Furry",
+         "English",
+         "GPT3.5Turbo",
+         "GPT4",
+         "Male",
+         "OC",
+         "SFW <-> NSFW",
+         "Futanari",
+         "Multiple Characters",
+         "Roleplay",
+         "Games",
+         "OAI",
+         "Anthro",
+         "Female"
+      ],
+      "creator": "WARAII",
+      "character_version": "main",
+      "extensions": {
+         "chub": {
+            "id": 253124,
+            "full_path": "WARAII/character-card-tutorial-b9acc7d6",
+            "expressions": null,
+            "alt_expressions": {},
+            "related_lorebooks": []
+         }
+      },
+      "character_book": null
+   }
+}

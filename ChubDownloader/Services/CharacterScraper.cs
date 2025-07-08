@@ -82,35 +82,48 @@ namespace ChubDownloader.Services
             var rows = _webDriver.FindElements(By.CssSelector("main table tbody tr")).ToList();
             progress.Report($"Найдено пользователей: {rows.Count}");
 
-            for (int i = 0; i < rows.Count; i++)
+            // Сохраняем URL'ы пользователей
+            var userUrls = new List<(string userName, string userUrl)>();
+            
+            foreach (var row in rows)
             {
-                if (cancellationToken.IsCancellationRequested) break;
-
-                var row = rows[i];
                 try
                 {
                     var linkElem = row.FindElement(By.CssSelector("td:nth-child(2) a"));
                     var userName = linkElem.Text.Trim().TrimStart('@');
                     var userUrl = linkElem.GetAttribute("href");
+                    userUrls.Add((userName, userUrl));
+                }
+                catch { }
+            }
 
-                    progress.Report($"[User {i + 1}/{rows.Count}] {userName}");
+            // Теперь обрабатываем каждого пользователя в той же вкладке
+            for (int i = 0; i < userUrls.Count; i++)
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+
+                var (userName, userUrl) = userUrls[i];
+                
+                try
+                {
+                    progress.Report($"[User {i + 1}/{userUrls.Count}] {userName}");
 
                     var userDir = Path.Combine(root, userName);
                     Directory.CreateDirectory(userDir);
 
-                    _webDriver.OpenNewTab(userUrl);
-                    await Task.Delay(150, cancellationToken);
-                    _webDriver.SwitchToLastTab();
+                    // Переходим на страницу пользователя в той же вкладке
+                    _webDriver.NavigateTo(userUrl);
+                    await Task.Delay(10, cancellationToken);
 
                     await DownloadUserCharactersAsync(userDir, progress, cancellationToken);
 
-                    _webDriver.CloseCurrentTab();
-                    _webDriver.SwitchToMainWindow();
+                    // Возвращаемся обратно на страницу лидерборда
+                    _webDriver.NavigateTo("https://chub.ai/leaderboard?segment=followers");
+                    await Task.Delay(10, cancellationToken);
                 }
                 catch (Exception ex)
                 {
                     progress.Report($"Ошибка обработки пользователя: {ex.Message}");
-                    _webDriver.SwitchToMainWindow();
                 }
             }
         }
@@ -123,7 +136,6 @@ namespace ChubDownloader.Services
 
             // Параметры для контроля проверки чатов
             bool checkChatCount = minChats > 0;
-            int batchSize = checkChatCount ? 5 : 20; // Меньше батч если проверяем чаты
 
             int endPage = startPage + pagesToScan - 1;
             progress.Report($"Начинаем сканирование с страницы {startPage} по {endPage}");
@@ -145,45 +157,37 @@ namespace ChubDownloader.Services
 
                 var cards = _webDriver.FindElements(By.CssSelector(CHARACTER_LIST_SELECTOR)).ToList();
                 
-                // Получаем информацию о чатах для всех карточек за один проход
-                var cardsWithChatCount = new List<(IWebElement card, string href, string id, int chatCount)>();
+                // Получаем информацию о всех персонажах на странице
+                var characterInfos = new List<(string href, string id, int chatCount)>();
                 
-                if (checkChatCount)
+                foreach (var card in cards)
                 {
-                    progress.Report($"Получение информации о чатах для {cards.Count} персонажей...");
-                    cardsWithChatCount = await GetCardsWithChatCountBatchAsync(cards, cancellationToken);
-                }
-                else
-                {
-                    // Без проверки чатов
-                    cardsWithChatCount = cards.Select(card => 
+                    try
                     {
                         var href = card.GetAttribute("href");
                         var id = href.TrimEnd('/').Split('/').Last();
-                        return (card, href, id, int.MaxValue);
-                    }).ToList();
+                        
+                        var chatCount = checkChatCount ? GetChatCount(card) : int.MaxValue;
+                        
+                        if (chatCount >= minChats && !IsCharacterExists(id, out _))
+                        {
+                            characterInfos.Add((href, id, chatCount));
+                        }
+                    }
+                    catch { }
                 }
 
-                // Фильтруем и скачиваем
-                foreach (var (card, href, id, chatCount) in cardsWithChatCount)
+                // Теперь обрабатываем каждого персонажа в той же вкладке
+                foreach (var (href, id, chatCount) in characterInfos)
                 {
                     if (cancellationToken.IsCancellationRequested) break;
 
                     try
                     {
-                        if (chatCount < minChats) continue;
-
-                        // Проверяем глобальный индекс
-                        if (IsCharacterExists(id, out var existingPath))
-                        {
-                            progress.Report($"{id} уже существует в {existingPath}");
-                            continue;
-                        }
-
                         progress.Report($"{id} (чатов: {chatCount})");
 
-                        _webDriver.OpenNewTab(href);
-                        _webDriver.SwitchToLastTab();
+                        _webDriver.NavigateTo(href);
+                        await Task.Delay(10, cancellationToken);
 
                         var downloaded = await DownloadCharacterJsonAsync(root, id);
                         if (downloaded)
@@ -192,8 +196,9 @@ namespace ChubDownloader.Services
                             RegisterCharacter(id, filePath);
                         }
 
-                        _webDriver.CloseCurrentTab();
-                        _webDriver.SwitchToMainWindow();
+                        // Возвращаемся на страницу списка
+                        _webDriver.NavigateTo(url);
+                        await Task.Delay(10, cancellationToken);
                     }
                     catch (Exception ex)
                     {
@@ -201,97 +206,6 @@ namespace ChubDownloader.Services
                     }
                 }
             }
-        }
-
-        private async Task<List<(IWebElement card, string href, string id, int chatCount)>> GetCardsWithChatCountBatchAsync(
-            List<IWebElement> cards, CancellationToken cancellationToken)
-        {
-            var result = new List<(IWebElement, string, string, int)>();
-            
-            // Получаем все чаты одним скриптом
-            var jsScript = @"
-                return Array.from(arguments[0]).map(card => {
-                    try {
-                        const href = card.getAttribute('href');
-                        const id = href.split('/').filter(p => p).pop();
-                        const iconBlock = card.querySelector('span.fake-ribbon > div');
-                        
-                        if (!iconBlock) return { href, id, chatCount: 0 };
-                        
-                        // Симулируем hover
-                        iconBlock.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-                        
-                        // Даем время на появление tooltip
-                        return new Promise(resolve => {
-                            setTimeout(() => {
-                                const tooltips = document.querySelectorAll('.ant-tooltip-inner');
-                                let chatCount = 0;
-                                
-                                for (const tooltip of tooltips) {
-                                    if (tooltip.style.display !== 'none' && tooltip.offsetParent !== null) {
-                                        const text = tooltip.textContent || '';
-                                        const match = text.match(/(\d+(?:\.\d+)?k?)\s*chats/i);
-                                        if (match) {
-                                            const numStr = match[1].toLowerCase();
-                                            if (numStr.endsWith('k')) {
-                                                chatCount = Math.floor(parseFloat(numStr.slice(0, -1)) * 1000);
-                                            } else {
-                                                chatCount = parseInt(numStr);
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                                
-                                iconBlock.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
-                                resolve({ href, id, chatCount });
-                            }, 300);
-                        });
-                    } catch (e) {
-                        return { href: '', id: '', chatCount: 0 };
-                    }
-                });
-            ";
-
-            try
-            {
-                var cardsArray = cards.ToArray();
-                var data = await Task.Run(() => 
-                    ((IJavaScriptExecutor)_webDriver.Driver).ExecuteAsyncScript(jsScript, cardsArray));
-                
-                if (data is IEnumerable<object> results)
-                {
-                    int index = 0;
-                    foreach (var item in results)
-                    {
-                        if (item is Dictionary<string, object> dict)
-                        {
-                            var href = dict.GetValueOrDefault("href")?.ToString() ?? "";
-                            var id = dict.GetValueOrDefault("id")?.ToString() ?? "";
-                            var chatCount = Convert.ToInt32(dict.GetValueOrDefault("chatCount") ?? 0);
-                            
-                            if (!string.IsNullOrEmpty(id))
-                            {
-                                result.Add((cards[index], href, id, chatCount));
-                            }
-                        }
-                        index++;
-                    }
-                }
-            }
-            catch
-            {
-                // Фоллбэк на старый метод если JS не сработал
-                foreach (var card in cards)
-                {
-                    var href = card.GetAttribute("href");
-                    var id = href.TrimEnd('/').Split('/').Last();
-                    var chatCount = GetChatCount(card);
-                    result.Add((card, href, id, chatCount));
-                }
-            }
-
-            return result;
         }
 
         private async Task DownloadUserCharactersAsync(string userDir, IProgress<string> progress, CancellationToken cancellationToken)
@@ -308,7 +222,9 @@ namespace ChubDownloader.Services
 
             int pageNum = 1;
             bool hasNext = true;
+            var allCharacterUrls = new List<(string href, string id)>();
 
+            // Сначала собираем все URL'ы персонажей со всех страниц
             while (hasNext && !cancellationToken.IsCancellationRequested)
             {
                 var cards = _webDriver.FindElements(By.CssSelector(CHARACTER_LIST_SELECTOR)).ToList();
@@ -316,35 +232,39 @@ namespace ChubDownloader.Services
 
                 foreach (var card in cards)
                 {
-                    if (cancellationToken.IsCancellationRequested) break;
-
                     var href = card.GetAttribute("href");
                     var id = href.TrimEnd('/').Split('/').Last();
 
-                    // Проверяем глобальный индекс
-                    if (IsCharacterExists(id, out var existingPath))
+                    if (!IsCharacterExists(id, out _))
                     {
-                        progress.Report($"{id} уже существует в {existingPath}");
-                        continue;
+                        allCharacterUrls.Add((href, id));
                     }
-
-                    _webDriver.OpenNewTab(href);
-                    await Task.Delay(10, cancellationToken);
-                    _webDriver.SwitchToLastTab();
-
-                    var downloaded = await DownloadCharacterJsonAsync(userDir, id);
-                    if (downloaded)
-                    {
-                        var filePath = Path.Combine(userDir, id + ".json");
-                        RegisterCharacter(id, filePath);
-                    }
-
-                    _webDriver.CloseCurrentTab();
-                    _webDriver.SwitchToMainWindow();
                 }
 
                 hasNext = GoToNextPage();
                 if (hasNext) pageNum++;
+            }
+
+            // Теперь скачиваем персонажей, возвращаясь на нужную страницу пользователя
+            var currentUserUrl = _webDriver.Driver.Url;
+            
+            foreach (var (href, id) in allCharacterUrls)
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+
+                _webDriver.NavigateTo(href);
+                await Task.Delay(10, cancellationToken);
+
+                var downloaded = await DownloadCharacterJsonAsync(userDir, id);
+                if (downloaded)
+                {
+                    var filePath = Path.Combine(userDir, id + ".json");
+                    RegisterCharacter(id, filePath);
+                }
+
+                // Возвращаемся на страницу пользователя
+                _webDriver.NavigateTo(currentUserUrl);
+                await Task.Delay(10, cancellationToken);
             }
         }
 
@@ -403,6 +323,7 @@ namespace ChubDownloader.Services
                 if (iconBlocks.Count == 0) return 0;
 
                 actions.MoveToElement(iconBlocks[0]).Perform();
+                Thread.Sleep(10); // Даем время на появление tooltip
 
                 var tooltip = _webDriver.Driver.FindElements(By.CssSelector(".ant-tooltip-inner"))
                     .FirstOrDefault(el => el.Displayed);

@@ -1,6 +1,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using System.Runtime.InteropServices;
 
 namespace ChubDownloader.Services
 {
@@ -8,7 +9,7 @@ namespace ChubDownloader.Services
     {
         private readonly ChromeDriver _driver;
         private readonly string _mainWindowHandle;
-        private static int _debugPort = 9222; 
+        private static int _debugPort = 9222;
         
         public IWebDriver Driver => _driver;
         
@@ -18,8 +19,23 @@ namespace ChubDownloader.Services
             
             options.AddArgument($"--user-data-dir={userPath}");
             
-            options.AddArgument($"--remote-debugging-port={_debugPort++}"); // Инкрементируем порт для каждого экземпляра
+            options.AddArgument($"--remote-debugging-port={_debugPort++}");
             options.AddArgument("--remote-allow-origins=*");
+            
+            // Специальные настройки для macOS
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                // Отключаем анимации и визуальные эффекты
+                options.AddArgument("--wm-window-animations-disabled");
+                options.AddArgument("--animation-duration-scale=0");
+                
+                // Заставляем Chrome работать в фоне
+                options.AddArgument("--disable-features=RendererCodeIntegrity");
+                options.AddArgument("--disable-features=IsolateOrigins,site-per-process");
+                
+                // Минимизируем окно сразу после запуска
+                options.AddArgument("--start-minimized");
+            }
             
             options.AddArgument("--disable-backgrounding-occluded-windows");
             options.AddArgument("--disable-renderer-backgrounding");
@@ -32,8 +48,9 @@ namespace ChubDownloader.Services
             
             options.AddArgument("--disable-blink-features=AutomationControlled");
             
+            // Устанавливаем позицию окна за пределами видимой области
             options.AddArgument("--window-size=1280,800");
-            options.AddArgument("--window-position=100,100");
+            options.AddArgument("--window-position=10000,10000"); // Далеко за пределами экрана
             
             options.AddUserProfilePreference("download.default_directory", downloadPath);
             options.AddUserProfilePreference("download.prompt_for_download", false);
@@ -47,6 +64,19 @@ namespace ChubDownloader.Services
             _driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(15);
             
             _mainWindowHandle = _driver.CurrentWindowHandle;
+            
+            // Для macOS: минимизируем окно после запуска
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                try
+                {
+                    // Перемещаем окно за пределы экрана
+                    ((IJavaScriptExecutor)_driver).ExecuteScript(@"
+                        window.moveTo(10000, 10000);
+                    ");
+                }
+                catch { }
+            }
         }
         
         public void NavigateTo(string url)
@@ -56,31 +86,50 @@ namespace ChubDownloader.Services
         
         public void OpenNewTab(string url)
         {
+            // Используем JavaScript для открытия новой вкладки без фокуса
             ((IJavaScriptExecutor)_driver).ExecuteScript($@"
-                const link = document.createElement('a');
-                link.href = '{url}';
-                link.target = '_blank';
-                link.rel = 'noopener';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            ");
-            
+        const link = document.createElement('a');
+        link.href = '{url}';
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        
+        // Создаем событие с опцией не активировать окно
+        const event = new MouseEvent('click', {{
+            view: window,
+            bubbles: true,
+            cancelable: true,
+            ctrlKey: true  // Аналог Ctrl+Click для открытия в фоновой вкладке
+        }});
+        
+        document.body.appendChild(link);
+        link.dispatchEvent(event);
+        document.body.removeChild(link);
+    ");
         }
         
         public void SwitchToLastTab()
         {
-            _driver.SwitchTo().Window(_driver.WindowHandles.Last());
+            var handles = _driver.WindowHandles;
+            if (handles.Count > 0)
+            {
+                _driver.SwitchTo().Window(handles.Last());
+            }
         }
         
         public void CloseCurrentTab()
         {
-            _driver.Close();
+            if (_driver.WindowHandles.Count > 1)
+            {
+                _driver.Close();
+            }
         }
         
         public void SwitchToMainWindow()
         {
-            _driver.SwitchTo().Window(_mainWindowHandle);
+            if (_driver.WindowHandles.Contains(_mainWindowHandle))
+            {
+                _driver.SwitchTo().Window(_mainWindowHandle);
+            }
         }
         
         public bool WaitForElement(By by, int timeoutSeconds = 10)

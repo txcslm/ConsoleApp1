@@ -50,7 +50,6 @@ namespace ChubDownloader.Services
             
             // Устанавливаем позицию окна за пределами видимой области
             options.AddArgument("--window-size=1280,800");
-            options.AddArgument("--window-position=10000,10000"); // Далеко за пределами экрана
             
             options.AddUserProfilePreference("download.default_directory", downloadPath);
             options.AddUserProfilePreference("download.prompt_for_download", false);

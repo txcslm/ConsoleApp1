@@ -3,6 +3,7 @@ using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using ChubDownloader.Models;
 using System.Collections.Concurrent;
+using ConsoleApp1.Services;
 
 namespace ChubDownloader.Services
 {
@@ -114,7 +115,7 @@ namespace ChubDownloader.Services
             }
         }
 
-        public async Task DownloadFromSegmentAsync(Segment segment, int minChats, int pagesToScan, IProgress<string> progress, CancellationToken cancellationToken)
+        public async Task DownloadFromSegmentAsync(Segment segment, int minChats, int startPage, int pagesToScan, IProgress<string> progress, CancellationToken cancellationToken)
         {
             var segmentName = segment.ToString().ToLower();
             var root = Path.Combine(Environment.CurrentDirectory, $"characters");
@@ -124,19 +125,22 @@ namespace ChubDownloader.Services
             bool checkChatCount = minChats > 0;
             int batchSize = checkChatCount ? 5 : 20; // Меньше батч если проверяем чаты
 
-            for (int page = 1; page <= pagesToScan; page++)
+            int endPage = startPage + pagesToScan - 1;
+            progress.Report($"Начинаем сканирование с страницы {startPage} по {endPage}");
+
+            for (int page = startPage; page <= endPage; page++)
             {
                 if (cancellationToken.IsCancellationRequested) break;
 
-                progress.Report($"Страница {page}/{pagesToScan}");
+                progress.Report($"Страница {page}/{endPage} (осталось: {endPage - page + 1})");
 
                 string url = $"https://chub.ai/?segment={segmentName}&page={page}";
                 _webDriver.NavigateTo(url);
 
                 if (!_webDriver.WaitForElement(By.CssSelector(CHARACTER_LIST_SELECTOR)))
                 {
-                    progress.Report("Персонажи не найдены на странице");
-                    break;
+                    progress.Report($"Персонажи не найдены на странице {page}");
+                    continue;
                 }
 
                 var cards = _webDriver.FindElements(By.CssSelector(CHARACTER_LIST_SELECTOR)).ToList();
@@ -325,7 +329,7 @@ namespace ChubDownloader.Services
                     }
 
                     _webDriver.OpenNewTab(href);
-                    await Task.Delay(150, cancellationToken);
+                    await Task.Delay(10, cancellationToken);
                     _webDriver.SwitchToLastTab();
 
                     var downloaded = await DownloadCharacterJsonAsync(userDir, id);
@@ -348,7 +352,7 @@ namespace ChubDownloader.Services
         {
             try
             {
-                await Task.Delay(500); // Ждем загрузки страницы
+                await Task.Delay(10); // Ждем загрузки страницы
 
                 _downloadService.ClearOldFiles(_downloadPath, ".json");
 

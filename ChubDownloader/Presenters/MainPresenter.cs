@@ -1,6 +1,7 @@
 using ChubDownloader.Models;
 using ChubDownloader.Services;
 using ChubDownloader.Views;
+using ConsoleApp1.Services;
 
 namespace ChubDownloader.Presenters
 {
@@ -43,7 +44,7 @@ namespace ChubDownloader.Presenters
                 }
                 else if (e.Mode == DownloadMode.SegmentPages && e.Segment.HasValue)
                 {
-                    await _scraper.DownloadFromSegmentAsync(e.Segment.Value, e.MinChats, e.PagesToScan, progress, _cancellationTokenSource.Token);
+                    await _scraper.DownloadFromSegmentAsync(e.Segment.Value, e.MinChats, e.StartPage, e.PagesToScan, progress, _cancellationTokenSource.Token);
                 }
                 
                 _view.ShowMessage("Загрузка завершена!");

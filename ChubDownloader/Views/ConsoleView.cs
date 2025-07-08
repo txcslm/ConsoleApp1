@@ -9,47 +9,167 @@ namespace ChubDownloader.Views
         public void Start()
         {
             Console.WriteLine("=== Chub.ai Characters JSON Downloader ===");
-            Console.WriteLine("\nВыберите режим работы:");
-            Console.WriteLine("1. Скачать персонажей из лидерборда (followers)");
-            Console.WriteLine("2. Скачать персонажей с обычных страниц");
-            Console.Write("\nВаш выбор (1 или 2): ");
             
-            var choice = Console.ReadLine();
-            var args = new DownloadEventArgs();
+            var mode = GetDownloadModeWithValidation();
+            var args = new DownloadEventArgs { Mode = mode };
             
-            if (choice == "1")
+            if (mode == DownloadMode.SegmentPages)
             {
-                args.Mode = DownloadMode.Leaderboard;
-            }
-            else if (choice == "2")
-            {
-                args.Mode = DownloadMode.SegmentPages;
-                args.Segment = GetSegment();
-                args.MinChats = GetMinChats();
-                args.PagesToScan = GetPagesToScan();
-            }
-            else
-            {
-                ShowError("Неверный выбор!");
-                return;
+                args.Segment = GetSegmentWithValidation();
+                args.MinChats = GetMinChatsWithValidation();
+                args.StartPage = GetStartPageWithValidation();
+                args.PagesToScan = GetPagesToScanWithValidation();
             }
             
             DownloadRequested?.Invoke(this, args);
         }
         
+        private DownloadMode GetDownloadModeWithValidation()
+        {
+            while (true)
+            {
+                Console.WriteLine("\nВыберите режим работы:");
+                Console.WriteLine("1. Скачать персонажей из лидерборда (followers)");
+                Console.WriteLine("2. Скачать персонажей с обычных страниц");
+                Console.Write("\nВаш выбор (1 или 2): ");
+                
+                var choice = Console.ReadLine()?.Trim();
+                
+                switch (choice)
+                {
+                    case "1":
+                        return DownloadMode.Leaderboard;
+                    case "2":
+                        return DownloadMode.SegmentPages;
+                    default:
+                        Console.WriteLine("❌ Неверный выбор! Пожалуйста, введите 1 или 2.");
+                        continue;
+                }
+            }
+        }
+        
+        private Segment GetSegmentWithValidation()
+        {
+            while (true)
+            {
+                Console.WriteLine("\nВыберите сегмент:");
+                Console.WriteLine("1. Quality (качественные персонажи)");
+                Console.WriteLine("2. Newcomer (новые персонажи)");
+                Console.WriteLine("3. Trending (популярные)");
+                Console.WriteLine("4. Timeline (временная лента)");
+                Console.WriteLine("5. Evergreen (вечнозеленые)");
+                Console.Write("\nВаш выбор (1-5): ");
+                
+                var choice = Console.ReadLine()?.Trim();
+                
+                switch (choice)
+                {
+                    case "1":
+                        return Segment.Quality;
+                    case "2":
+                        return Segment.Newcomer;
+                    case "3":
+                        return Segment.Trending;
+                    case "4":
+                        return Segment.Timeline;
+                    case "5":
+                        return Segment.Evergreen;
+                    default:
+                        Console.WriteLine("❌ Неверный выбор! Пожалуйста, введите число от 1 до 5.");
+                        continue;
+                }
+            }
+        }
+        
+        private int GetMinChatsWithValidation()
+        {
+            while (true)
+            {
+                Console.Write("\nМинимальное количество чатов (0 = без ограничений, например 10000): ");
+                var input = Console.ReadLine()?.Trim();
+                
+                if (string.IsNullOrEmpty(input))
+                {
+                    Console.WriteLine("❌ Пожалуйста, введите число.");
+                    continue;
+                }
+                
+                if (int.TryParse(input, out int minChats) && minChats >= 0)
+                {
+                    if (minChats == 0)
+                    {
+                        Console.WriteLine("✅ Будут скачиваться все персонажи без ограничений по чатам.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"✅ Будут скачиваться персонажи с количеством чатов от {minChats:N0}.");
+                    }
+                    return minChats;
+                }
+                
+                Console.WriteLine("❌ Неверный формат! Пожалуйста, введите целое число больше или равное 0.");
+            }
+        }
+        
+        private int GetStartPageWithValidation()
+        {
+            while (true)
+            {
+                Console.Write("\nС какой страницы начать сканирование (например, 1): ");
+                var input = Console.ReadLine()?.Trim();
+                
+                if (string.IsNullOrEmpty(input))
+                {
+                    Console.WriteLine("❌ Пожалуйста, введите число.");
+                    continue;
+                }
+                
+                if (int.TryParse(input, out int startPage) && startPage >= 1)
+                {
+                    Console.WriteLine($"✅ Начинаем сканирование с страницы {startPage}.");
+                    return startPage;
+                }
+                
+                Console.WriteLine("❌ Неверный формат! Пожалуйста, введите целое число больше 0.");
+            }
+        }
+        
+        private int GetPagesToScanWithValidation()
+        {
+            while (true)
+            {
+                Console.Write("\nСколько страниц сканировать (например, 5): ");
+                var input = Console.ReadLine()?.Trim();
+                
+                if (string.IsNullOrEmpty(input))
+                {
+                    Console.WriteLine("❌ Пожалуйста, введите число.");
+                    continue;
+                }
+                
+                if (int.TryParse(input, out int pagesToScan) && pagesToScan >= 1)
+                {
+                    Console.WriteLine($"✅ Будет просканировано {pagesToScan} страниц.");
+                    return pagesToScan;
+                }
+                
+                Console.WriteLine("❌ Неверный формат! Пожалуйста, введите целое число больше 0.");
+            }
+        }
+        
         public void ShowMessage(string message)
         {
-            Console.WriteLine(message);
+            Console.WriteLine($"✅ {message}");
         }
         
         public void ShowError(string error)
         {
-            Console.WriteLine($"[ERROR] {error}");
+            Console.WriteLine($"❌ [ERROR] {error}");
         }
         
         public void UpdateProgress(string progress)
         {
-            Console.WriteLine($"[PROGRESS] {progress}");
+            Console.WriteLine($"📊 {progress}");
         }
         
         public void SetEnabled(bool enabled)
@@ -57,48 +177,25 @@ namespace ChubDownloader.Views
             // В консольном приложении не используется
         }
         
+        // Устаревшие методы для совместимости
         public DownloadMode GetDownloadMode()
         {
-            // Уже обработано в Start()
-            return DownloadMode.Leaderboard;
+            return GetDownloadModeWithValidation();
         }
         
         public Segment GetSegment()
         {
-            Console.WriteLine("\nВыберите сегмент:");
-            Console.WriteLine("1. quality");
-            Console.WriteLine("2. newcomer");
-            Console.WriteLine("3. trending");
-            Console.WriteLine("4. timeline");
-            Console.WriteLine("5. evergreen");
-            Console.Write("\nВаш выбор (1-5): ");
-            
-            var choice = Console.ReadLine();
-            return choice switch
-            {
-                "1" => Segment.Quality,
-                "2" => Segment.Newcomer,
-                "3" => Segment.Trending,
-                "4" => Segment.Timeline,
-                "5" => Segment.Evergreen,
-                _ => Segment.Quality
-            };
+            return GetSegmentWithValidation();
         }
         
         public int GetMinChats()
         {
-            Console.Write("\nМинимальное количество чатов (например, 10000): ");
-            if (int.TryParse(Console.ReadLine(), out int minChats))
-                return minChats;
-            return 10000;
+            return GetMinChatsWithValidation();
         }
         
         public int GetPagesToScan()
         {
-            Console.Write("\nКоличество страниц для сканирования (например, 5): ");
-            if (int.TryParse(Console.ReadLine(), out int pages))
-                return pages;
-            return 5;
+            return GetPagesToScanWithValidation();
         }
     }
 }

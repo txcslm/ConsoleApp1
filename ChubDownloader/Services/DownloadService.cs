@@ -5,6 +5,14 @@ using System.Threading;
 
 namespace ChubDownloader.Services
 {
+  /// <summary>
+  /// Сервис для загрузки и управления файлами персонажей.
+  /// </summary>
+  /// <remarks>
+  /// Этот сервис отвечает за ожидание завершения загрузки файлов персонажей,
+  /// проверку стабильности загружаемых файлов, перемещение их в центральную папку
+  /// и очистку устаревших файлов.
+  /// </remarks>
   public class DownloadService : IDownloadService
   {
     private const int DownloadWaitMaxMs = 5000;

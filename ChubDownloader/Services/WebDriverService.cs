@@ -8,7 +8,6 @@ namespace ChubDownloader.Services
     public class WebDriverService : IWebDriverService
     {
         private readonly ChromeDriver _driver;
-        private readonly string _mainWindowHandle;
         private static int _debugPort = 9222;
         
         public IWebDriver Driver => _driver;
@@ -62,7 +61,6 @@ namespace ChubDownloader.Services
             _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);
             _driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(15);
             
-            _mainWindowHandle = _driver.CurrentWindowHandle;
             
             // Для macOS: минимизируем окно после запуска
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -83,54 +81,6 @@ namespace ChubDownloader.Services
             _driver.Navigate().GoToUrl(url);
         }
         
-        public void OpenNewTab(string url)
-        {
-            // Используем JavaScript для открытия новой вкладки без фокуса
-            ((IJavaScriptExecutor)_driver).ExecuteScript($@"
-        const link = document.createElement('a');
-        link.href = '{url}';
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        
-        // Создаем событие с опцией не активировать окно
-        const event = new MouseEvent('click', {{
-            view: window,
-            bubbles: true,
-            cancelable: true,
-            ctrlKey: true  // Аналог Ctrl+Click для открытия в фоновой вкладке
-        }});
-        
-        document.body.appendChild(link);
-        link.dispatchEvent(event);
-        document.body.removeChild(link);
-    ");
-        }
-        
-        public void SwitchToLastTab()
-        {
-            var handles = _driver.WindowHandles;
-            if (handles.Count > 0)
-            {
-                _driver.SwitchTo().Window(handles.Last());
-            }
-        }
-        
-        public void CloseCurrentTab()
-        {
-            if (_driver.WindowHandles.Count > 1)
-            {
-                _driver.Close();
-            }
-        }
-        
-        public void SwitchToMainWindow()
-        {
-            if (_driver.WindowHandles.Contains(_mainWindowHandle))
-            {
-                _driver.SwitchTo().Window(_mainWindowHandle);
-            }
-        }
-        
         public bool WaitForElement(By by, int timeoutSeconds = 10)
         {
             try
@@ -144,6 +94,12 @@ namespace ChubDownloader.Services
                 return false;
             }
         }
+
+        /// <summary>
+        /// Находит элементы на странице по заданному селектору.
+        /// </summary>
+        /// <param name="by">Селектор для поиска элементов.</param>
+        /// <returns>Коллекция найденных элементов.</returns>
         
         public IReadOnlyCollection<IWebElement> FindElements(By by)
         {

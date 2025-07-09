@@ -4,13 +4,14 @@ using ChubDownloader.Views;
 
 namespace ChubDownloader.Presenters;
 
-public sealed class MainPresenter
+public sealed class MainPresenter : IDisposable
 {
     private readonly IUserInteraction _userInteraction;
     private readonly IProgressDisplay _progressDisplay;
     private readonly IViewStateManager _viewStateManager;
     private readonly ICharacterScrapingOrchestrator _scrapingOrchestrator;
     private CancellationTokenSource? _cancellationTokenSource;
+    private bool _disposed;
 
     public MainPresenter(
         IUserInteraction userInteraction,
@@ -28,6 +29,7 @@ public sealed class MainPresenter
     private async void OnDownloadRequested(object? sender, DownloadEventArgs e)
     {
         _viewStateManager.SetEnabled(false);
+        _cancellationTokenSource?.Dispose();
         _cancellationTokenSource = new CancellationTokenSource();
 
         var progress = new Progress<string>(message => _progressDisplay.UpdateProgress(message));
@@ -63,5 +65,15 @@ public sealed class MainPresenter
     public void Stop()
     {
         _cancellationTokenSource?.Cancel();
+    }
+
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            _userInteraction.DownloadRequested -= OnDownloadRequested;
+            _cancellationTokenSource?.Dispose();
+            _disposed = true;
+        }
     }
 }

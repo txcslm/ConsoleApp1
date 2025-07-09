@@ -6,7 +6,7 @@ using ChubDownloader.Core.Configuration;
 
 namespace ChubDownloader.Infrastructure.WebDriver;
 
-public sealed class WebDriverService : IWebDriverService
+public sealed class WebDriverService : IWebDriverService, IAsyncDisposable
 {
     private readonly ChromeDriver _driver;
     private static int _debugPort = AppSettings.DefaultDebugPort;
@@ -143,10 +143,51 @@ public sealed class WebDriverService : IWebDriverService
     
     public void Dispose()
     {
-        if (_disposed)
-            return;
-            
-        _driver?.Quit();
-        _disposed = true;
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore();
+        Dispose(false);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!_disposed && disposing)
+        {
+            try
+            {
+                _driver?.Quit();
+            }
+            catch
+            {
+                // Ignore cleanup errors
+            }
+            _disposed = true;
+        }
+    }
+    
+    protected async ValueTask DisposeAsyncCore()
+    {
+        if (!_disposed)
+        {
+            try
+            {
+                await Task.Run(() => _driver?.Quit());
+            }
+            catch
+            {
+                // Ignore cleanup errors
+            }
+            _disposed = true;
+        }
+    }
+    
+    ~WebDriverService()
+    {
+        Dispose(false);
     }
 }

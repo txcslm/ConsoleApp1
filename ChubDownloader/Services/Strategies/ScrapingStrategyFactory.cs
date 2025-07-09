@@ -19,11 +19,18 @@ public sealed class ScrapingStrategyFactory : IScrapingStrategyFactory
 
     public IScrapingStrategy CreateStrategy(DownloadMode mode)
     {
-        return mode switch
+        try
         {
-            DownloadMode.Leaderboard => _serviceProvider.GetRequiredService<LeaderboardScrapingStrategy>(),
-            DownloadMode.SegmentPages => _serviceProvider.GetRequiredService<SegmentScrapingStrategy>(),
-            _ => throw new ArgumentException($"Unsupported download mode: {mode}", nameof(mode))
-        };
+            return mode switch
+            {
+                DownloadMode.Leaderboard => _serviceProvider.GetRequiredService<LeaderboardScrapingStrategy>(),
+                DownloadMode.SegmentPages => _serviceProvider.GetRequiredService<SegmentScrapingStrategy>(),
+                _ => throw new ArgumentException($"Unsupported download mode: {mode}", nameof(mode))
+            };
+        }
+        catch (Exception ex) when (!(ex is ArgumentException))
+        {
+            throw new InvalidOperationException($"Failed to create strategy for mode '{mode}': {ex.Message}", ex);
+        }
     }
 }

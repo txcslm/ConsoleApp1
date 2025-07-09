@@ -27,9 +27,9 @@ public sealed class NavigationService : INavigationService
         await Task.Delay(AppSettings.TaskDelayMs);
     }
 
-    public async Task<bool> WaitForElementAsync(By selector, int timeoutSeconds = AppSettings.WebDriverTimeoutSeconds)
+    public Task<bool> WaitForElementAsync(By selector, int timeoutSeconds = AppSettings.WebDriverTimeoutSeconds)
     {
-        return await Task.Run(() => _webDriverService.WaitForElement(selector, timeoutSeconds));
+        return Task.FromResult(_webDriverService.WaitForElement(selector, timeoutSeconds));
     }
 
     public bool GoToNextPage()

@@ -69,11 +69,25 @@ namespace ChubDownloader.Services
             }
         }
 
-        private static bool CharacterExists(string[] folderPath, string characterId, string extension)
+        private static bool CharacterExists(string[] folderPaths, string characterId, string extension)
         {
-            return folderPath.Select(folder => Directory.GetFiles(folder, $"*{extension}", SearchOption.TopDirectoryOnly))
-                .Any(files => files.Any(f => Path.GetFileNameWithoutExtension(f)
-                    .Equals(characterId, StringComparison.OrdinalIgnoreCase)));
+            int extLen = extension.Length;
+            int idLen  = characterId.Length;
+
+            return (from folder in folderPaths
+                from filePath in Directory.EnumerateFiles(folder, "*" + extension, SearchOption.TopDirectoryOnly)
+                let idx1 = filePath.LastIndexOf(Path.DirectorySeparatorChar)
+                let idx2 = filePath.LastIndexOf(Path.AltDirectorySeparatorChar)
+                let nameStart = Math.Max(idx1, idx2) + 1
+                where filePath.Length - nameStart - extLen == idLen
+                where string.Compare(filePath, // исходная строка
+                          nameStart, // смещение, откуда сравнивать
+                          characterId, // что сравнивать
+                          0, // смещение в characterId
+                          idLen, // сколько символов сравнивать
+                          StringComparison.OrdinalIgnoreCase) ==
+                      0
+                select filePath).Any();
         }
 
         public void ClearOldFiles(string rootPath, string extension)

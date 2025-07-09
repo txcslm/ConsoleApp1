@@ -12,9 +12,9 @@ public sealed class DownloadService : IDownloadService
         _fileSystemService = fileSystemService;
     }
 
-    public async Task<bool> WaitForFileDownloadAsync(string tempPath, string rootPath, string characterId, string extension)
+    public async Task<bool> WaitForFileDownloadAsync(string tempPath, string targetPath, string characterId, string extension)
     {
-        return await _fileSystemService.WaitForFileDownloadAsync(tempPath, rootPath, characterId, extension);
+        return await _fileSystemService.WaitForFileDownloadAsync(tempPath, targetPath, characterId, extension);
     }
 
 

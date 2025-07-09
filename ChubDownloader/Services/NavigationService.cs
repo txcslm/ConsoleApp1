@@ -1,0 +1,60 @@
+using OpenQA.Selenium;
+using ChubDownloader.Infrastructure.WebDriver;
+using ChubDownloader.Core.Configuration;
+
+namespace ChubDownloader.Services;
+
+public interface INavigationService
+{
+    Task NavigateToAsync(string url);
+    Task<bool> WaitForElementAsync(By selector, int timeoutSeconds = AppSettings.WebDriverTimeoutSeconds);
+    bool GoToNextPage();
+    Task DelayAsync(int milliseconds = AppSettings.TaskDelayMs, CancellationToken cancellationToken = default);
+}
+
+public sealed class NavigationService : INavigationService
+{
+    private readonly IWebDriverService _webDriverService;
+
+    public NavigationService(IWebDriverService webDriverService)
+    {
+        _webDriverService = webDriverService;
+    }
+
+    public async Task NavigateToAsync(string url)
+    {
+        _webDriverService.NavigateTo(url);
+        await Task.Delay(AppSettings.TaskDelayMs);
+    }
+
+    public async Task<bool> WaitForElementAsync(By selector, int timeoutSeconds = AppSettings.WebDriverTimeoutSeconds)
+    {
+        return await Task.Run(() => _webDriverService.WaitForElement(selector, timeoutSeconds));
+    }
+
+    public bool GoToNextPage()
+    {
+        try
+        {
+            var nextButton = _webDriverService.FindElements(By.XPath(WebDriverSettings.NextPageXPath)).FirstOrDefault() ??
+                             _webDriverService.FindElements(By.CssSelector(WebDriverSettings.AntPaginationNextSelector)).FirstOrDefault();
+
+            if (nextButton != null && nextButton.GetAttribute("aria-disabled") != "true")
+            {
+                ((IJavaScriptExecutor)_webDriverService.Driver).ExecuteScript("arguments[0].click();", nextButton);
+                Thread.Sleep(AppSettings.ThreadSleepMs);
+                return true;
+            }
+        }
+        catch
+        {
+            // Ignore
+        }
+        return false;
+    }
+
+    public async Task DelayAsync(int milliseconds = AppSettings.TaskDelayMs, CancellationToken cancellationToken = default)
+    {
+        await Task.Delay(milliseconds, cancellationToken);
+    }
+}

@@ -1,9 +1,9 @@
 using ChubDownloader.Models;
 
-namespace ChubDownloader.Views
+namespace ChubDownloader.Views;
+
+public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay, IViewStateManager
 {
-    public class ConsoleView : IMainView
-    {
         public event EventHandler<DownloadEventArgs>? DownloadRequested;
         
         public void Start()
@@ -197,5 +197,9 @@ namespace ChubDownloader.Views
         {
             return GetPagesToScanWithValidation();
         }
-    }
+        
+        public int GetStartPage()
+        {
+            return GetStartPageWithValidation();
+        }
 }

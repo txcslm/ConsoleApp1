@@ -13,6 +13,7 @@ public sealed class LeaderboardScrapingStrategy : IScrapingStrategy
     private readonly IProgressReporter _progressReporter;
     private readonly ICharacterIndexManager _indexManager;
     private readonly IDownloadService _downloadService;
+    private readonly string _downloadPath;
 
     public LeaderboardScrapingStrategy(
         IWebDriverService webDriverService,
@@ -20,7 +21,8 @@ public sealed class LeaderboardScrapingStrategy : IScrapingStrategy
         INavigationService navigationService,
         IProgressReporter progressReporter,
         ICharacterIndexManager indexManager,
-        IDownloadService downloadService)
+        IDownloadService downloadService,
+        string downloadPath)
     {
         _webDriverService = webDriverService;
         _elementExtractor = elementExtractor;
@@ -28,6 +30,7 @@ public sealed class LeaderboardScrapingStrategy : IScrapingStrategy
         _progressReporter = progressReporter;
         _indexManager = indexManager;
         _downloadService = downloadService;
+        _downloadPath = downloadPath;
     }
 
     public async Task ExecuteAsync(ScrapingParameters parameters, IProgress<string> progress, CancellationToken cancellationToken)
@@ -140,13 +143,13 @@ public sealed class LeaderboardScrapingStrategy : IScrapingStrategy
         {
             await _navigationService.DelayAsync();
 
-            _downloadService.ClearOldFiles(targetDir, AppSettings.JsonExtension);
+            _downloadService.ClearOldFiles(_downloadPath, AppSettings.JsonExtension);
 
             var jsonBtn = _elementExtractor.TryFindJsonButton();
             if (jsonBtn != null)
             {
                 jsonBtn.Click();
-                return await _downloadService.WaitForFileDownloadAsync(targetDir, targetDir, characterId, AppSettings.JsonExtension);
+                return await _downloadService.WaitForFileDownloadAsync(_downloadPath, targetDir, characterId, AppSettings.JsonExtension);
             }
 
             Console.WriteLine($"JSON-кнопка не найдена для {characterId}");

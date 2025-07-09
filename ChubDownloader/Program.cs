@@ -66,7 +66,8 @@ internal static class Program
                 provider.GetRequiredService<INavigationService>(),
                 provider.GetRequiredService<IProgressReporter>(),
                 provider.GetRequiredService<ICharacterIndexManager>(),
-                provider.GetRequiredService<IDownloadService>()));
+                provider.GetRequiredService<IDownloadService>(),
+                downloadPath));
                 
         services.AddTransient<SegmentScrapingStrategy>(provider => 
             new SegmentScrapingStrategy(
@@ -75,7 +76,8 @@ internal static class Program
                 provider.GetRequiredService<INavigationService>(),
                 provider.GetRequiredService<IProgressReporter>(),
                 provider.GetRequiredService<ICharacterIndexManager>(),
-                provider.GetRequiredService<IDownloadService>()));
+                provider.GetRequiredService<IDownloadService>(),
+                downloadPath));
         
         services.AddSingleton<IScrapingStrategyFactory>(provider => 
             new ScrapingStrategyFactory(provider));

@@ -46,10 +46,17 @@ public sealed class FileSystemService : IFileSystemService
         var extLen = extension.Length;
         var idLen = characterId.Length;
 
-        return folderPaths
-            .Where(Directory.Exists)
-            .SelectMany(folder => Directory.EnumerateFiles(folder, $"*{extension}", SearchOption.TopDirectoryOnly))
-            .Any(filePath => IsCharacterFile(filePath, characterId, idLen, extLen));
+        foreach (var folder in folderPaths)
+        {
+            if (!Directory.Exists(folder)) continue;
+            
+            foreach (var filePath in Directory.EnumerateFiles(folder, $"*{extension}", SearchOption.TopDirectoryOnly))
+            {
+                if (IsCharacterFile(filePath, characterId, idLen, extLen))
+                    return true;
+            }
+        }
+        return false;
     }
     
     private static bool IsCharacterFile(string filePath, string characterId, int idLen, int extLen)
@@ -62,12 +69,11 @@ public sealed class FileSystemService : IFileSystemService
                string.Compare(filePath, nameStart, characterId, 0, idLen, StringComparison.OrdinalIgnoreCase) == 0;
     }
     
-    public async Task<bool> WaitForFileDownloadAsync(string tempPath, string rootPath, string characterId, string extension)
+    public async Task<bool> WaitForFileDownloadAsync(string tempPath, string targetPath, string characterId, string extension)
     {
         try
         {
-            var charactersPath = Path.Combine(rootPath);
-            Directory.CreateDirectory(charactersPath);
+            Directory.CreateDirectory(targetPath);
             
             var maxAttempts = AppSettings.DownloadWaitMaxMs / AppSettings.DownloadCheckIntervalMs;
             var cutoffTime = DateTime.Now.AddSeconds(-AppSettings.RecentFileSeconds);
@@ -78,9 +84,9 @@ public sealed class FileSystemService : IFileSystemService
                 
                 if (sourceFile != null && await IsFileStableAsync(sourceFile))
                 {
-                    var destFile = Path.Combine(charactersPath, characterId + extension);
+                    var destFile = Path.Combine(targetPath, characterId + extension);
                     
-                    if (CharacterExists([rootPath, AppSettings.CharactersFolderName], characterId, extension))
+                    if (CharacterExists([targetPath, AppSettings.CharactersFolderName], characterId, extension))
                     {
                         Console.WriteLine($"[DUPLICATE] Character {characterId} already exists. Skipping download.");
                         return false;

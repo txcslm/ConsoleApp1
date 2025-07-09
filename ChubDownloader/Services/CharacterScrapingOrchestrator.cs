@@ -22,27 +22,57 @@ public sealed class CharacterScrapingOrchestrator : ICharacterScrapingOrchestrat
 
     public async Task DownloadFromLeaderboardAsync(IProgress<string> progress, CancellationToken cancellationToken)
     {
-        var strategy = _strategyFactory.CreateStrategy(DownloadMode.Leaderboard);
-        var parameters = new ScrapingParameters
+        try
         {
-            DownloadPath = _downloadPath
-        };
+            var strategy = _strategyFactory.CreateStrategy(DownloadMode.Leaderboard);
+            if (strategy == null)
+            {
+                progress?.Report("Ошибка: Не удалось создать стратегию для загрузки лидерборда");
+                return;
+            }
 
-        await strategy.ExecuteAsync(parameters, progress, cancellationToken);
+            var parameters = new ScrapingParameters
+            {
+                DownloadPath = _downloadPath
+            };
+
+            parameters.ValidateOrThrow();
+            await strategy.ExecuteAsync(parameters, progress, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            progress?.Report($"Критическая ошибка при загрузке лидерборда: {ex.Message}");
+            throw;
+        }
     }
 
     public async Task DownloadFromSegmentAsync(Segment segment, int minChats, int startPage, int pagesToScan, IProgress<string> progress, CancellationToken cancellationToken)
     {
-        var strategy = _strategyFactory.CreateStrategy(DownloadMode.SegmentPages);
-        var parameters = new ScrapingParameters
+        try
         {
-            Segment = segment,
-            MinChats = minChats,
-            StartPage = startPage,
-            PagesToScan = pagesToScan,
-            DownloadPath = _downloadPath
-        };
+            var strategy = _strategyFactory.CreateStrategy(DownloadMode.SegmentPages);
+            if (strategy == null)
+            {
+                progress?.Report("Ошибка: Не удалось создать стратегию для загрузки сегмента");
+                return;
+            }
 
-        await strategy.ExecuteAsync(parameters, progress, cancellationToken);
+            var parameters = new ScrapingParameters
+            {
+                Segment = segment,
+                MinChats = minChats,
+                StartPage = startPage,
+                PagesToScan = pagesToScan,
+                DownloadPath = _downloadPath
+            };
+
+            parameters.ValidateOrThrow();
+            await strategy.ExecuteAsync(parameters, progress, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            progress?.Report($"Критическая ошибка при загрузке сегмента: {ex.Message}");
+            throw;
+        }
     }
 }

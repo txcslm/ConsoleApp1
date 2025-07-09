@@ -11,6 +11,9 @@ public sealed class FileSystemService : IFileSystemService
         WriteIndented = true
     };
     
+    private readonly Dictionary<string, HashSet<string>> _fileIndexCache = new();
+    private readonly object _indexLock = new();
+    
     public async Task<ConcurrentDictionary<string, string>> LoadCharacterIndexAsync(string indexFilePath)
     {
         try
@@ -43,20 +46,56 @@ public sealed class FileSystemService : IFileSystemService
     
     public bool CharacterExists(string[] folderPaths, string characterId, string extension)
     {
-        var extLen = extension.Length;
-        var idLen = characterId.Length;
-
-        foreach (var folder in folderPaths)
+        lock (_indexLock)
         {
-            if (!Directory.Exists(folder)) continue;
-            
-            foreach (var filePath in Directory.EnumerateFiles(folder, $"*{extension}", SearchOption.TopDirectoryOnly))
+            foreach (var folder in folderPaths)
             {
-                if (IsCharacterFile(filePath, characterId, idLen, extLen))
+                if (!Directory.Exists(folder)) continue;
+                
+                var cacheKey = $"{folder}:{extension}";
+                if (!_fileIndexCache.TryGetValue(cacheKey, out var characterIds))
+                {
+                    characterIds = BuildFileIndex(folder, extension);
+                    _fileIndexCache[cacheKey] = characterIds;
+                }
+                
+                if (characterIds.Contains(characterId))
                     return true;
             }
         }
         return false;
+    }
+    
+    private HashSet<string> BuildFileIndex(string folder, string extension)
+    {
+        var characterIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var extLen = extension.Length;
+        
+        foreach (var filePath in Directory.EnumerateFiles(folder, $"*{extension}", SearchOption.TopDirectoryOnly))
+        {
+            var characterId = ExtractCharacterIdFromFilePath(filePath, extLen);
+            if (!string.IsNullOrEmpty(characterId))
+            {
+                characterIds.Add(characterId);
+            }
+        }
+        
+        return characterIds;
+    }
+    
+    private string? ExtractCharacterIdFromFilePath(string filePath, int extLen)
+    {
+        var idx1 = filePath.LastIndexOf(Path.DirectorySeparatorChar);
+        var idx2 = filePath.LastIndexOf(Path.AltDirectorySeparatorChar);
+        var nameStart = Math.Max(idx1, idx2) + 1;
+        var nameEnd = filePath.Length - extLen;
+        
+        if (nameEnd > nameStart)
+        {
+            return filePath.Substring(nameStart, nameEnd - nameStart);
+        }
+        
+        return null;
     }
     
     private static bool IsCharacterFile(string filePath, string characterId, int idLen, int extLen)

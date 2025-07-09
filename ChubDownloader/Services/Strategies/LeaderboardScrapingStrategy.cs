@@ -95,10 +95,16 @@ public sealed class LeaderboardScrapingStrategy : IScrapingStrategy
         var allCharacterUrls = await CollectAllCharacterUrlsAsync(progress, cancellationToken);
         var currentUserUrl = _webDriverService.Driver.Url;
 
+        if (allCharacterUrls.Count == 0)
+        {
+            _progressReporter.ReportProgress(progress, "Нет персонажей для загрузки");
+            return;
+        }
+
         await DownloadCollectedCharactersAsync(allCharacterUrls, userDir, currentUserUrl, cancellationToken);
     }
 
-    private Task<List<(string href, string id)>> CollectAllCharacterUrlsAsync(IProgress<string> progress, CancellationToken cancellationToken)
+    private async Task<List<(string href, string id)>> CollectAllCharacterUrlsAsync(IProgress<string> progress, CancellationToken cancellationToken)
     {
         var allCharacterUrls = new List<(string href, string id)>();
         int pageNum = 1;
@@ -109,14 +115,14 @@ public sealed class LeaderboardScrapingStrategy : IScrapingStrategy
             var cards = _webDriverService.FindElements(By.CssSelector(WebDriverSettings.CharacterListSelector)).ToListOptimized();
             _progressReporter.ReportProgress(progress, $"Страница {pageNum}: {cards.Count} персонажей");
 
-            var characterUrls = _elementExtractor.ExtractCharacterUrls(cards, _indexManager);
+            var characterUrls = await _elementExtractor.ExtractCharacterUrlsAsync(cards, _indexManager);
             allCharacterUrls.AddRange(characterUrls);
 
             hasNext = _navigationService.GoToNextPage();
             if (hasNext) pageNum++;
         }
 
-        return Task.FromResult(allCharacterUrls);
+        return allCharacterUrls;
     }
 
     private async Task DownloadCollectedCharactersAsync(List<(string href, string id)> allCharacterUrls, string userDir, string currentUserUrl, CancellationToken cancellationToken)

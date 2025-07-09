@@ -65,14 +65,21 @@ public sealed class SegmentScrapingStrategy : IScrapingStrategy
                 continue;
             }
 
-            await ProcessCharactersOnPageAsync(url, parameters.MinChats, checkChatCount, root, progress, cancellationToken);
+            try
+            {
+                await ProcessCharactersOnPageAsync(url, parameters.MinChats, checkChatCount, root, progress, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _progressReporter.ReportError(progress, $"Ошибка обработки страницы {page}: {ex.Message}");
+            }
         }
     }
 
     private async Task ProcessCharactersOnPageAsync(string pageUrl, int minChats, bool checkChatCount, string root, IProgress<string> progress, CancellationToken cancellationToken)
     {
         var cards = _webDriverService.FindElements(By.CssSelector(WebDriverSettings.CharacterListSelector)).ToListOptimized();
-        var characterInfos = _elementExtractor.ExtractCharacterInfos(cards, minChats, checkChatCount, _indexManager);
+        var characterInfos = await _elementExtractor.ExtractCharacterInfosAsync(cards, minChats, checkChatCount, _indexManager);
 
         await ProcessCharactersAsync(characterInfos, pageUrl, root, progress, cancellationToken);
     }

@@ -27,9 +27,22 @@ internal static class Program
         }
         finally
         {
-            // Cleanup WebDriver
-            var webDriver = services.GetService<IWebDriverService>();
-            webDriver?.Dispose();
+            // Cleanup all disposable services
+            try
+            {
+                var webDriver = services.GetService<IWebDriverService>();
+                webDriver?.Dispose();
+                
+                var mainPresenter = services.GetService<MainPresenter>();
+                mainPresenter?.Dispose();
+                
+                var indexManager = services.GetService<ICharacterIndexManager>();
+                ((IDisposable)indexManager)?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during cleanup: {ex.Message}");
+            }
         }
     }
     
@@ -51,7 +64,7 @@ internal static class Program
         services.AddSingleton<IDownloadService>(provider => 
             new DownloadService(provider.GetRequiredService<IFileSystemService>()));
         services.AddSingleton<ICharacterIndexManager>(provider => 
-            new CharacterIndexManager(provider.GetRequiredService<IFileSystemService>()));
+            CharacterIndexManagerFactory.CreateAsync(provider.GetRequiredService<IFileSystemService>()).GetAwaiter().GetResult());
         services.AddSingleton<IWebElementExtractor>(provider => 
             new WebElementExtractor(provider.GetRequiredService<IWebDriverService>()));
         services.AddSingleton<INavigationService>(provider => 

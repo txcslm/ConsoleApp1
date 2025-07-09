@@ -13,26 +13,26 @@ public sealed class ProgressReporter : IProgressReporter
 {
     public void ReportProgress(IProgress<string> progress, string message)
     {
-        progress.Report(message);
+        progress?.Report(message ?? string.Empty);
     }
 
     public void ReportUserProgress(IProgress<string> progress, int currentUser, int totalUsers, string userName)
     {
-        progress.Report($"[User {currentUser}/{totalUsers}] {userName}");
+        progress?.Report($"[User {currentUser}/{totalUsers}] {userName ?? "Unknown"}");
     }
 
     public void ReportPageProgress(IProgress<string> progress, int currentPage, int totalPages)
     {
-        progress.Report($"Страница {currentPage}/{totalPages} (осталось: {totalPages - currentPage + 1})");
+        progress?.Report($"Страница {currentPage}/{totalPages} (осталось: {totalPages - currentPage + 1})");
     }
 
     public void ReportCharacterProgress(IProgress<string> progress, string characterId, int chatCount)
     {
-        progress.Report($"{characterId} (чатов: {chatCount})");
+        progress?.Report($"{characterId ?? "Unknown"} (чатов: {chatCount})");
     }
 
     public void ReportError(IProgress<string> progress, string error)
     {
-        progress.Report($"Ошибка: {error}");
+        progress?.Report($"Ошибка: {error ?? "Unknown error"}");
     }
 }

@@ -131,7 +131,7 @@ namespace ChubDownloader.Services
         public async Task DownloadFromSegmentAsync(Segment segment, int minChats, int startPage, int pagesToScan, IProgress<string> progress, CancellationToken cancellationToken)
         {
             var segmentName = segment.ToString().ToLower();
-            var root = Path.Combine(Environment.CurrentDirectory, $"characters");
+            var root = Path.Combine(Environment.CurrentDirectory, $"characters2");
             Directory.CreateDirectory(root);
 
             // Параметры для контроля проверки чатов

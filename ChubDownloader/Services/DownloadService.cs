@@ -21,6 +21,7 @@ namespace ChubDownloader.Services
                 // Ensure the central characters folder exists
                 var charactersPath = Path.Combine(rootPath);
                 Directory.CreateDirectory(charactersPath);
+                string[] folders = [rootPath, "characters"];
 
                 int maxAttempts = DownloadWaitMaxMs / DownloadCheckIntervalMs;
 
@@ -46,7 +47,7 @@ namespace ChubDownloader.Services
                         {
                             var destFile = Path.Combine(charactersPath, characterId + extension);
 
-                            if (CharacterExists(charactersPath, characterId, extension))
+                            if (CharacterExists(folders, characterId, extension))
                             {
                                 Console.WriteLine($"[DUPLICATE] Character {characterId} already exists in '{CharactersFolderName}' folder. Skipping download.");
                                 return false;
@@ -68,11 +69,11 @@ namespace ChubDownloader.Services
             }
         }
 
-        private static bool CharacterExists(string folderPath, string characterId, string extension)
+        private static bool CharacterExists(string[] folderPath, string characterId, string extension)
         {
-            var files = Directory.GetFiles(folderPath, $"*{extension}", SearchOption.TopDirectoryOnly);
-            return files.Any(f => Path.GetFileNameWithoutExtension(f)
-                .Equals(characterId, StringComparison.OrdinalIgnoreCase));
+            return folderPath.Select(folder => Directory.GetFiles(folder, $"*{extension}", SearchOption.TopDirectoryOnly))
+                .Any(files => files.Any(f => Path.GetFileNameWithoutExtension(f)
+                    .Equals(characterId, StringComparison.OrdinalIgnoreCase)));
         }
 
         public void ClearOldFiles(string rootPath, string extension)

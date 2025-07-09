@@ -145,11 +145,6 @@ namespace ChubDownloader.Services
             }
         }
         
-        public IWebElement FindElement(By by)
-        {
-            return _driver.FindElement(by);
-        }
-        
         public IReadOnlyCollection<IWebElement> FindElements(By by)
         {
             return _driver.FindElements(by);

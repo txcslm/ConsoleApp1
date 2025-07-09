@@ -4,7 +4,7 @@ namespace ChubDownloader.Views
 {
     public class ConsoleView : IMainView
     {
-        public event EventHandler<DownloadEventArgs> DownloadRequested;
+        public event EventHandler<DownloadEventArgs>? DownloadRequested;
         
         public void Start()
         {

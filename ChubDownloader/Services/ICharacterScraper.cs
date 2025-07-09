@@ -1,6 +1,6 @@
 using ChubDownloader.Models;
 
-namespace ConsoleApp1.Services;
+namespace ChubDownloader.Services;
 
 public interface ICharacterScraper
 {

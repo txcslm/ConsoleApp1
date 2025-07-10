@@ -33,7 +33,8 @@ internal static class Program
                 var webDriver = services.GetService<IWebDriverService>();
                 webDriver?.Dispose();
                 
-                var mainPresenter = services.GetService<MainPresenter>();
+                var mainPresenter = services.GetService<MainPresenter>();`p-=[]
+                    \gtfdreswaq SQDWEFRGT.≤≥/?"
                 mainPresenter?.Dispose();
                 
                 var indexManager = services.GetService<ICharacterIndexManager>();

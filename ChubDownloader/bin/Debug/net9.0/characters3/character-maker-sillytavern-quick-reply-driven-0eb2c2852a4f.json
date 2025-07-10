@@ -1,0 +1,44 @@
+{
+   "spec": "chara_card_v2",
+   "spec_version": "2.0",
+   "data": {
+      "name": "Character Maker QR",
+      "description": "{{// See Alt. Greeting for Required and optional Downloads}}\n{{// Read the Lorebook entry '000 Info' to set the character up}}\n\nWill create and describe a Character using earlier information prioritizing the information {{user}} gives. Flesh everything out to at least one sentence.\nIf there is missing information generate it.\n[Use present tense.]\n[Use the metric system]\n\n\n{{// (note)}}\n{{// Anything here will not be sent to the AI. Use to disable parts}}\n{{// If you have problem getting the character to generate or want to edit the generation criteria open the lorebook and read '000 Info'}}",
+      "personality": "",
+      "first_mes": "<h2 align='center'><a href=https://github.com/drago87/ST-Character-Maker/wiki\" style=\"text-align:center\">Installation Guide</a>\n<h2 align='center'>Required Downloads</h2>\nLorebook that is need for it to work [Character Maker Combined NSFW Lorebook](https://github.com/drago87/ST-Character-Maker/blob/main/Lorebooks/Character%20Maker%20Combined%20NSFW.json)  (Needed)\n\nLorebook that controls generation for each generation [Character Maker Combined NSFW GenRaw Lorebook](https://github.com/drago87/ST-Character-Maker/blob/main/Lorebooks/Character%20Maker%20Combined%20NSFW%20GenRaw.json) (Needed) Sort it after Name A-Z\n\nLorebook that contains user changeable inputs for generations.\n[Character Maker Combined NSFW Variables](https://github.com/drago87/ST-Character-Maker/blob/main/Lorebooks/Character%20Maker%20Combined%20NSFW%20Variables.json) (Needed) Sort it after Name A-Z\n\n---\n<h2 align='center'>Quick Reply Sets</h2>\n[Visible QR Buttons](https://github.com/drago87/ST-Character-Maker/blob/main/Quick%20Reply%20Buttons/Character%20Maker.json) The only set you need to add to the Global Quick Reply Sets (Needed)\nIt contains 3 buttons.\n- New Chat and Set Character Gender and Type (Makes a new chat and lets you select Gender, Type and transformation of the character. **Start with this**)\n- Character Generator Swipe (Lets you swipe the last message making a new one without loosing the old one)\n- Generate Character Choice (Lets you select what you want to generate next)\n\n[Character Maker Generation](https://github.com/drago87/ST-Character-Maker/blob/main/Quick%20Reply%20Buttons/Character%20Maker%20V4.json)  All the logic for the Generate Character Choice button. (Needed)\n\n01. Generate Basic Information (Needs to be first)\n02. Generate Appearance information (Can be used multiple times)\n03. Generate Personality Traits And Quirks\n04. Character's Relation to user\n05. Generate Relationship Information (Family, Friends, Enemies and Rivals)\n06. Generate Known Kinks\n07. Generate Latent Kinks (Will be hidden from the rest of the generation)\n08. Generate Outfit and Gear (Can be used multiple times)\n09. Generate Background Information\n10. Generate Interaction Style\n11. Generate Contextual Information (Setting and Daily Routine)\n12. Additional Notes (Strengths, Weaknesses, Likes, Dislikes, Sexual Knowledge and Sexual Experience)\n13. Spells and Abilities\n14. Copy Character Rules (Copies the rules the character will follow to the chat from the Lorebook)\n15. Generate Extras (Personality Summary and Speech Examples)\n16. Generate Scenario (Makes a scenario that can be used as a first message) (Can make multiple)\n\n---\n\n<h2 align='center'>Required External Downloads</h2>\n\n[LALib](https://github.com/LenAnderson/SillyTavern-LALib) required for Character Maker LaLib Chat Quick Reply Sets (Needed) (Update needed for V6.0)\n\n---\n<h2 align='center'>Optional Downloads</h2>\n\n[TabbyAPI Models](https://github.com/drago87/ST-Character-Maker/blob/main/Lorebooks/TabbyAPI%20Loader%20Setting.json) Models and settings i have tried.\n\n[SillyTavern-Variable-Viewer](https://github.com/LenAnderson/SillyTavern-Variable-Viewer) Addon for SillyTavern to see variables that are in use. (Recommended for debugging)\nTo debug empty the Flushvar QR button from the \"Character Maker V4\" set. This let you see all variables that are used and if something is wrong you can probably find it here. a broken var usually looks likt this '{{something}}'. (This \"button\" empties all local variables that this cards buttons makes)\n\n---\n\nFor best result use a Empty Persona named user\n\nStart by pressing the QR button \"New Chat and Set Character Gender and Type\"",
+      "avatar": "https://avatars.charhub.io/avatars/Drago87/character-maker-sillytavern-quick-reply-driven-0eb2c2852a4f/chara_card_v2.png",
+      "mes_example": "",
+      "scenario": "",
+      "creator_notes": "\nCan generate\n- Human Female/Male\n- Anthropomorphic Animals Female/Male\n- Beastkin Female/Male\n- Demi-Human Female/Male\n- Non-Humanoid Female/Male\n- Pokémon Female/Male (Almost no testing and will probably need a Pokémon Lorebook or a good model)\n- Machines (Heavy WIP and almost no testing done)\n\n[Installation Guide](https://github.com/drago87/ST-Character-Maker/wiki)\nUsing a empty persona is recommended.\n\nIf you have any tips on refinements of the Lorebook/QR buttons as well if you want any new fields for the generation make a comment (On [chub.ai](https://chub.ai/characters/Drago87/character-maker-sillytavern-quick-reply-driven-0eb2c2852a4f) or on the [github](https://github.com/drago87/ST-Character-Maker)) and i will look it over.\n\nEspecially the  `/genraw`\n\n<h2 align='center'>Example characters made with this</h2>\n[Èmilie](https://chub.ai/characters/Drago87/emilie-63c2aa603413) [ST Chat files](https://github.com/drago87/ST-Character-Maker/tree/main/Chat%20Examples)\n<h2 align='center'>________________________________</h2>\n\n<h2 align='center'>Last Update</h2>\nV6.1.5 - Beta\nIf you have LALIb v3.3.1 update to v3.3.2 as v3.3.1 breaks the scripts\nFixed the first message not getting saved when renaming the chat.\n\nUpdate\n\n[Character Maker v4](https://github.com/drago87/ST-Character-Maker/blob/main/Quick%20Reply%20Buttons/Character%20Maker%20V4.json)\n\n<h2 align='center'>________________________________</h2>\n\nAll extra information like age/kinks/fears/species will guide the direction of the character.\n\nYou can then edit the output to your liking or make it regen all of it.\n\n\nThen using [Intro Writer Chan](https://chub.ai/characters/fbdnchoco/intro-writer-chan-3721039feacc) You can generate a First Message\n\n\nIf you can think of something to make it better plz make a comment or make a fork (then a comment with a link to the fork)\n\n\n<h2 align='center'>________________________________</h2>\n\nKnown Problems\n\n\nWhen using 'release' branch the FlushVar button will not work. (This should not have any negative effects.)(Not tested for a while now and the release branch may have been updated)\nIf you want to manually remove the variables you can use [SillyTavern-Variable-Viewer](https://github.com/LenAnderson/SillyTavern-Variable-Viewer) or manually remove them by first using the '/listvar' command to get all variables in use followed by '/flushvar x' where x is the variable name.\nSome subcategories need refining",
+      "system_prompt": "",
+      "post_history_instructions": "",
+      "alternate_greetings": [],
+      "tags": [
+         "sillytavern",
+         "qr buttons",
+         "helper",
+         "tabbyapi",
+         "character maker"
+      ],
+      "creator": "Drago87",
+      "character_version": "main",
+      "extensions": {
+         "chub": {
+            "id": 2702715,
+            "preset": null,
+            "full_path": "Drago87/character-maker-sillytavern-quick-reply-driven-0eb2c2852a4f",
+            "extensions": [],
+            "expressions": null,
+            "alt_expressions": {},
+            "background_image": null,
+            "related_lorebooks": []
+         },
+         "depth_prompt": {
+            "role": "system",
+            "depth": 4,
+            "prompt": ""
+         }
+      },
+      "character_book": null
+   }
+}

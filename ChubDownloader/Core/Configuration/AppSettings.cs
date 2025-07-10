@@ -20,6 +20,7 @@ public sealed class AppSettings
     public const string CharactersFolderName = "characters";
     public const string FollowersFolderName = "followers";
     public const string Characters2FolderName = "characters2";
+    public const string Characters3FolderName = "characters3";
     public const string CharacterIndexFileName = "character_index.json";
     
     public const string JsonExtension = ".json";

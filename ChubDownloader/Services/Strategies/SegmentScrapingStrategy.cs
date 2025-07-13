@@ -42,7 +42,7 @@ public sealed class SegmentScrapingStrategy : IScrapingStrategy
         }
 
         var segmentName = parameters.Segment.Value.ToString().ToLower();
-        var root = Path.Combine(Environment.CurrentDirectory, AppSettings.Characters3FolderName);
+        var root = Path.Combine(Environment.CurrentDirectory, AppSettings.Characters4FolderName);
         Directory.CreateDirectory(root);
 
         var checkChatCount = parameters.MinChats > 0;

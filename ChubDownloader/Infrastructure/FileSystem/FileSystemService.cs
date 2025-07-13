@@ -148,11 +148,22 @@ public sealed class FileSystemService : IFileSystemService
     
     private static FileInfo? GetMostRecentFile(string tempPath, string extension, DateTime cutoffTime)
     {
-        return Directory.GetFiles(tempPath, $"*{extension}")
-            .Select(f => new FileInfo(f))
-            .Where(f => f.CreationTime > cutoffTime)
-            .OrderByDescending(f => f.CreationTime)
-            .FirstOrDefault();
+        var files = Directory.GetFiles(tempPath, $"*{extension}");
+        
+        FileInfo? mostRecent = null;
+        DateTime latestTime = DateTime.MinValue;
+        
+        foreach (var filePath in files)
+        {
+            var fileInfo = new FileInfo(filePath);
+            if (fileInfo.CreationTime > cutoffTime && fileInfo.CreationTime > latestTime)
+            {
+                mostRecent = fileInfo;
+                latestTime = fileInfo.CreationTime;
+            }
+        }
+        
+        return mostRecent;
     }
     
     private static async Task<bool> IsFileStableAsync(FileInfo file)
@@ -171,14 +182,16 @@ public sealed class FileSystemService : IFileSystemService
                 return;
                 
             var cutoffTime = DateTime.Now.AddMinutes(-AppSettings.OldFileAgeMinutes);
-            var oldFiles = Directory.GetFiles(rootPath, $"*{extension}")
-                .Where(f => File.GetCreationTime(f) < cutoffTime);
-                
-            foreach (var file in oldFiles)
+            var files = Directory.GetFiles(rootPath, $"*{extension}");
+            
+            foreach (var file in files)
             {
                 try
                 {
-                    File.Delete(file);
+                    if (File.GetCreationTime(file) < cutoffTime)
+                    {
+                        File.Delete(file);
+                    }
                 }
                 catch
                 {

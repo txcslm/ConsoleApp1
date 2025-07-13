@@ -125,7 +125,7 @@ public sealed class FileSystemService : IFileSystemService
                 {
                     var destFile = Path.Combine(targetPath, characterId + extension);
                     
-                    if (CharacterExists([targetPath, AppSettings.CharactersFolderName, AppSettings.Characters2FolderName, AppSettings.Characters3FolderName, AppSettings.FollowersFolderName], characterId, extension))
+                    if (CharacterExists([targetPath, AppSettings.CharactersFolderName, AppSettings.Characters2FolderName, AppSettings.Characters3FolderName, AppSettings.FollowersFolderName, AppSettings.Characters4FolderName], characterId, extension))
                     {
                         Console.WriteLine($"[DUPLICATE] Character {characterId} already exists. Skipping download.");
                         return false;

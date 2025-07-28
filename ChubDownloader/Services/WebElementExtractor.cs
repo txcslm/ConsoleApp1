@@ -30,19 +30,36 @@ public sealed class WebElementExtractor : IWebElementExtractor
 
     public IWebElement? TryFindJsonButton()
     {
-        foreach (var xpath in WebDriverSettings.JsonButtonXPaths)
+        Console.WriteLine($"🔍 Поиск JSON кнопки среди {WebDriverSettings.JsonButtonXPaths.Length} селекторов...");
+        
+        for (int i = 0; i < WebDriverSettings.JsonButtonXPaths.Length; i++)
         {
+            var xpath = WebDriverSettings.JsonButtonXPaths[i];
             try
             {
+                var findStart = DateTime.Now;
                 var element = _webDriverService.Driver.FindElement(By.XPath(xpath));
+                var findTime = DateTime.Now - findStart;
+                
+                Console.WriteLine($"🔍 Селектор {i + 1}: найден элемент за {findTime.TotalMilliseconds:F0}мс");
+                
                 if (element.Displayed && element.Enabled)
+                {
+                    Console.WriteLine($"✅ JSON кнопка найдена с селектором {i + 1}: {xpath}");
                     return element;
+                }
+                else
+                {
+                    Console.WriteLine($"⚠️ Селектор {i + 1}: элемент найден, но недоступен (Displayed: {element.Displayed}, Enabled: {element.Enabled})");
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore
+                Console.WriteLine($"❌ Селектор {i + 1} не сработал: {ex.GetType().Name}");
             }
         }
+        
+        Console.WriteLine($"❌ JSON кнопка не найдена ни с одним из {WebDriverSettings.JsonButtonXPaths.Length} селекторов");
         return null;
     }
 
@@ -98,11 +115,15 @@ public sealed class WebElementExtractor : IWebElementExtractor
 
     public async Task<List<(string href, string id, int chatCount)>> ExtractCharacterInfosAsync(IList<IWebElement> cards, int minChats, bool checkChatCount, ICharacterIndexManager indexManager)
     {
+        Console.WriteLine($"🔍 Извлекаем информацию из {cards.Count} карточек (минимум чатов: {minChats}, проверка чатов: {checkChatCount})");
+        
         var characterInfos = new List<(string href, string id, int chatCount)>(cards.Count);
         var candidateIds = new List<string>(cards.Count);
         var candidateInfos = new List<(string href, string id, int chatCount)>(cards.Count);
+        var skippedByChats = 0;
+        var invalidCards = 0;
 
-        // First pass: collect all candidate IDs and their basic info
+        var extractStart = DateTime.Now;
         foreach (var card in cards)
         {
             try
@@ -119,26 +140,48 @@ public sealed class WebElementExtractor : IWebElementExtractor
                         candidateIds.Add(id);
                         candidateInfos.Add((href, id, chatCount));
                     }
+                    else
+                    {
+                        skippedByChats++;
+                        Console.WriteLine($"⚠️ Пропущен {id}: недостаточно чатов ({chatCount} < {minChats})");
+                    }
+                }
+                else
+                {
+                    invalidCards++;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore invalid cards
+                invalidCards++;
+                Console.WriteLine($"❌ Ошибка обработки карточки: {ex.Message}");
             }
         }
-
-        // Batch check existence for all candidates
-        var existenceResults = await Task.WhenAll(candidateIds.Select(id => indexManager.IsCharacterExistsAsync(id)));
+        var extractTime = DateTime.Now - extractStart;
         
-        // Second pass: filter out existing characters
+        Console.WriteLine($"📊 Первый проход: найдено {candidateInfos.Count} кандидатов, пропущено по чатам: {skippedByChats}, невалидных: {invalidCards} за {extractTime.TotalSeconds:F1}с");
+
+        var checkStart = DateTime.Now;
+        var existenceResults = await Task.WhenAll(candidateIds.Select(indexManager.IsCharacterExistsAsync));
+        var checkTime = DateTime.Now - checkStart;
+        
+        Console.WriteLine($"🔍 Проверка существования {candidateIds.Count} персонажей заняла: {checkTime.TotalSeconds:F1}с");
+        
+        var alreadyExists = 0;
         for (int i = 0; i < candidateInfos.Count; i++)
         {
             if (!existenceResults[i])
             {
                 characterInfos.Add(candidateInfos[i]);
             }
+            else
+            {
+                alreadyExists++;
+                Console.WriteLine($"⚠️ Персонаж {candidateInfos[i].id} уже существует в индексе");
+            }
         }
 
+        Console.WriteLine($"✅ Финальный результат: {characterInfos.Count} новых персонажей (существующих: {alreadyExists})");
         return characterInfos;
     }
 
@@ -148,7 +191,6 @@ public sealed class WebElementExtractor : IWebElementExtractor
         var candidateIds = new List<string>(cards.Count);
         var candidateUrls = new List<(string href, string id)>(cards.Count);
 
-        // First pass: collect all candidate IDs and URLs
         foreach (var card in cards)
         {
             try
@@ -168,10 +210,8 @@ public sealed class WebElementExtractor : IWebElementExtractor
             }
         }
 
-        // Batch check existence for all candidates
-        var existenceResults = await Task.WhenAll(candidateIds.Select(id => indexManager.IsCharacterExistsAsync(id)));
+        var existenceResults = await Task.WhenAll(candidateIds.Select(indexManager.IsCharacterExistsAsync));
         
-        // Second pass: filter out existing characters
         for (int i = 0; i < candidateUrls.Count; i++)
         {
             if (!existenceResults[i])

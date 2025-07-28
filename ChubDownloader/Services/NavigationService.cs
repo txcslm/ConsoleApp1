@@ -24,7 +24,7 @@ public sealed class NavigationService : INavigationService
     public async Task NavigateToAsync(string url)
     {
         _webDriverService.NavigateTo(url);
-        await Task.Delay(AppSettings.TaskDelayMs);
+        await Task.CompletedTask;
     }
 
     public Task<bool> WaitForElementAsync(By selector, int timeoutSeconds = AppSettings.WebDriverTimeoutSeconds)

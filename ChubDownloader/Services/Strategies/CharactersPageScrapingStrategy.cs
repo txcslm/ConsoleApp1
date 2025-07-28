@@ -37,11 +37,13 @@ public sealed class CharactersPageScrapingStrategy : IScrapingStrategy
     {
         var root = Path.Combine(Environment.CurrentDirectory, AppSettings.Characters5FolderName);
         Directory.CreateDirectory(root);
+        _progressReporter.ReportProgress(progress, $"📁 Создана папка: {root}");
 
         var checkChatCount = parameters.MinChats > 0;
         var endPage = parameters.StartPage + parameters.PagesToScan - 1;
 
-        _progressReporter.ReportProgress(progress, $"Начинаем сканирование персонажей с страницы {parameters.StartPage} по {endPage}");
+        _progressReporter.ReportProgress(progress, $"🚀 Начинаем сканирование персонажей с страницы {parameters.StartPage} по {endPage}");
+        _progressReporter.ReportProgress(progress, $"⚙️ Режим проверки чатов: {(checkChatCount ? $"мин. {parameters.MinChats} чатов" : "без ограничений")}");
 
         for (int page = parameters.StartPage; page <= endPage; page++)
         {
@@ -50,23 +52,42 @@ public sealed class CharactersPageScrapingStrategy : IScrapingStrategy
             _progressReporter.ReportPageProgress(progress, page, endPage);
 
             var url = BuildCharactersPageUrl(page);
+            _progressReporter.ReportProgress(progress, $"🌐 Переходим на: {url}");
+            
+            var navigationStart = DateTime.Now;
             await _navigationService.NavigateToAsync(url);
+            var navigationTime = DateTime.Now - navigationStart;
+            _progressReporter.ReportProgress(progress, $"⏱️ Навигация заняла: {navigationTime.TotalSeconds:F1}с");
 
+            var waitStart = DateTime.Now;
             if (!await _navigationService.WaitForElementAsync(By.CssSelector(WebDriverSettings.CharactersPageSelector)))
             {
-                _progressReporter.ReportProgress(progress, $"Персонажи не найдены на странице {page}");
+                _progressReporter.ReportProgress(progress, $"❌ Персонажи не найдены на странице {page} (селектор: {WebDriverSettings.CharactersPageSelector})");
                 continue;
             }
+            var waitTime = DateTime.Now - waitStart;
+            _progressReporter.ReportProgress(progress, $"✅ Элементы загружены за: {waitTime.TotalSeconds:F1}с");
 
             try
             {
+                var processStart = DateTime.Now;
                 await ProcessCharactersOnPageAsync(url, parameters.MinChats, checkChatCount, root, progress, cancellationToken);
+                var processTime = DateTime.Now - processStart;
+                _progressReporter.ReportProgress(progress, $"⚡ Обработка страницы {page} завершена за: {processTime.TotalSeconds:F1}с");
             }
             catch (Exception ex)
             {
-                _progressReporter.ReportError(progress, $"Ошибка обработки страницы {page}: {ex.Message}");
+                _progressReporter.ReportError(progress, $"❌ Ошибка обработки страницы {page}: {ex.Message}");
+                _progressReporter.ReportProgress(progress, $"🔍 Stack trace: {ex.StackTrace}");
             }
         }
+
+        var totalPages = endPage - parameters.StartPage + 1;
+        _progressReporter.ReportProgress(progress, $"🎉 Сканирование завершено!");
+        _progressReporter.ReportProgress(progress, $"📈 Итоговая статистика:");
+        _progressReporter.ReportProgress(progress, $"   • Обработано страниц: {totalPages}");
+        _progressReporter.ReportProgress(progress, $"   • Персонажей на странице: до 50 (вместо 20)");
+        _progressReporter.ReportProgress(progress, $"   • Проверка файлов в папке: {Path.Combine(Environment.CurrentDirectory, AppSettings.Characters5FolderName)}");
     }
 
     private static string BuildCharactersPageUrl(int page)
@@ -76,59 +97,128 @@ public sealed class CharactersPageScrapingStrategy : IScrapingStrategy
 
     private async Task ProcessCharactersOnPageAsync(string pageUrl, int minChats, bool checkChatCount, string root, IProgress<string> progress, CancellationToken cancellationToken)
     {
+        var findStart = DateTime.Now;
         var cards = _webDriverService.FindElements(By.CssSelector(WebDriverSettings.CharactersPageSelector)).ToListOptimized();
+        var findTime = DateTime.Now - findStart;
+        
+        _progressReporter.ReportProgress(progress, $"🔍 Найдено карточек персонажей: {cards.Count} за {findTime.TotalMilliseconds:F0}мс");
+        
+        if (cards.Count == 0)
+        {
+            _progressReporter.ReportProgress(progress, $"⚠️ Карточки не найдены с селектором: {WebDriverSettings.CharactersPageSelector}");
+            return;
+        }
+
+        var extractStart = DateTime.Now;
         var characterInfos = await _elementExtractor.ExtractCharacterInfosAsync(cards, minChats, checkChatCount, _indexManager);
+        var extractTime = DateTime.Now - extractStart;
+        
+        _progressReporter.ReportProgress(progress, $"📊 Извлечено подходящих персонажей: {characterInfos.Count} из {cards.Count} за {extractTime.TotalSeconds:F1}с");
+
+        if (characterInfos.Count == 0)
+        {
+            _progressReporter.ReportProgress(progress, $"⚠️ Нет новых персонажей для скачивания на этой странице");
+            return;
+        }
 
         await ProcessCharactersAsync(characterInfos, pageUrl, root, progress, cancellationToken);
     }
 
     private async Task ProcessCharactersAsync(List<(string href, string id, int chatCount)> characterInfos, string pageUrl, string root, IProgress<string> progress, CancellationToken cancellationToken)
     {
-        foreach (var (href, id, chatCount) in characterInfos)
+        var totalCharacters = characterInfos.Count;
+        var successCount = 0;
+        var failCount = 0;
+
+        _progressReporter.ReportProgress(progress, $"🎯 Начинаем загрузку {totalCharacters} персонажей...");
+
+        for (int i = 0; i < characterInfos.Count; i++)
         {
             if (cancellationToken.IsCancellationRequested) break;
 
+            var (href, id, chatCount) = characterInfos[i];
+            var characterNumber = i + 1;
+
             try
             {
-                _progressReporter.ReportCharacterProgress(progress, id, chatCount);
+                _progressReporter.ReportProgress(progress, $"📥 [{characterNumber}/{totalCharacters}] Загружаем: {id} (чатов: {chatCount})");
 
+                var navStart = DateTime.Now;
                 await _navigationService.NavigateToAsync(href);
+                var navTime = DateTime.Now - navStart;
 
-                if (await DownloadCharacterJsonAsync(root, id))
+                var downloadStart = DateTime.Now;
+                var downloadSuccess = await DownloadCharacterJsonAsync(root, id);
+                var downloadTime = DateTime.Now - downloadStart;
+
+                if (downloadSuccess)
                 {
                     var filePath = Path.Combine(root, id + AppSettings.JsonExtension);
                     await _indexManager.RegisterCharacterAsync(id, filePath);
+                    successCount++;
+                    _progressReporter.ReportProgress(progress, $"✅ [{characterNumber}/{totalCharacters}] {id} загружен за {(navTime + downloadTime).TotalSeconds:F1}с");
+                }
+                else
+                {
+                    failCount++;
+                    _progressReporter.ReportProgress(progress, $"❌ [{characterNumber}/{totalCharacters}] {id} - не удалось загрузить JSON");
                 }
 
+                // Возвращаемся на страницу списка персонажей
+                var backNavStart = DateTime.Now;
                 await _navigationService.NavigateToAsync(pageUrl);
+                var backNavTime = DateTime.Now - backNavStart;
+                
+                if (backNavTime.TotalSeconds > 2)
+                {
+                    _progressReporter.ReportProgress(progress, $"⚠️ Медленная навигация назад: {backNavTime.TotalSeconds:F1}с");
+                }
             }
             catch (Exception ex)
             {
-                _progressReporter.ReportError(progress, ex.Message);
+                failCount++;
+                _progressReporter.ReportError(progress, $"❌ [{characterNumber}/{totalCharacters}] Ошибка с {id}: {ex.Message}");
             }
         }
+
+        _progressReporter.ReportProgress(progress, $"📈 Итоги: ✅ успешно {successCount}, ❌ ошибок {failCount} из {totalCharacters}");
     }
 
     private async Task<bool> DownloadCharacterJsonAsync(string targetDir, string characterId)
     {
         try
         {
+            var delayStart = DateTime.Now;
             await _navigationService.DelayAsync();
+            var delayTime = DateTime.Now - delayStart;
 
+            var clearStart = DateTime.Now;
             _downloadService.ClearOldFiles(_downloadPath, AppSettings.JsonExtension);
+            var clearTime = DateTime.Now - clearStart;
 
+            var findButtonStart = DateTime.Now;
             var jsonBtn = _elementExtractor.TryFindJsonButton();
+            var findBtnTime = DateTime.Now - findButtonStart;
+
             if (jsonBtn != null)
             {
+                var clickStart = DateTime.Now;
                 jsonBtn.Click();
-                return await _downloadService.WaitForFileDownloadAsync(_downloadPath, targetDir, characterId, AppSettings.JsonExtension);
+                var clickTime = DateTime.Now - clickStart;
+
+                var waitStart = DateTime.Now;
+                var result = await _downloadService.WaitForFileDownloadAsync(_downloadPath, targetDir, characterId, AppSettings.JsonExtension);
+                var waitTime = DateTime.Now - waitStart;
+
+                Console.WriteLine($"🔧 {characterId}: delay={delayTime.TotalMilliseconds:F0}мс, clear={clearTime.TotalMilliseconds:F0}мс, find={findBtnTime.TotalMilliseconds:F0}мс, click={clickTime.TotalMilliseconds:F0}мс, wait={waitTime.TotalSeconds:F1}с");
+                return result;
             }
 
-            Console.WriteLine($"JSON-кнопка не найдена для {characterId}");
+            Console.WriteLine($"❌ JSON-кнопка не найдена для {characterId} (поиск занял {findBtnTime.TotalMilliseconds:F0}мс)");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Ошибка загрузки JSON: {ex.Message}");
+            Console.WriteLine($"❌ Ошибка загрузки JSON для {characterId}: {ex.Message}");
         }
 
         return false;

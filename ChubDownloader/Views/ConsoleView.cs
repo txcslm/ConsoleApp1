@@ -20,6 +20,12 @@ public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay,
                 args.StartPage = GetStartPageWithValidation();
                 args.PagesToScan = GetPagesToScanWithValidation();
             }
+            else if (mode == DownloadMode.CharactersPages)
+            {
+                args.MinChats = GetMinChatsWithValidation();
+                args.StartPage = GetStartPageWithValidation();
+                args.PagesToScan = GetPagesToScanWithValidation();
+            }
             
             DownloadRequested?.Invoke(this, args);
         }
@@ -30,8 +36,9 @@ public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay,
             {
                 Console.WriteLine("\nВыберите режим работы:");
                 Console.WriteLine("1. Скачать персонажей из лидерборда (followers)");
-                Console.WriteLine("2. Скачать персонажей с обычных страниц");
-                Console.Write("\nВаш выбор (1 или 2): ");
+                Console.WriteLine("2. Скачать персонажей с обычных страниц (по сегментам)");
+                Console.WriteLine("3. Скачать персонажей с основной страницы персонажей");
+                Console.Write("\nВаш выбор (1, 2 или 3): ");
                 
                 var choice = Console.ReadLine()?.Trim();
                 
@@ -41,8 +48,10 @@ public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay,
                         return DownloadMode.Leaderboard;
                     case "2":
                         return DownloadMode.SegmentPages;
+                    case "3":
+                        return DownloadMode.CharactersPages;
                     default:
-                        Console.WriteLine("❌ Неверный выбор! Пожалуйста, введите 1 или 2.");
+                        Console.WriteLine("❌ Неверный выбор! Пожалуйста, введите 1, 2 или 3.");
                         continue;
                 }
             }

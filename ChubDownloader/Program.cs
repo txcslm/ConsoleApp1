@@ -91,6 +91,16 @@ internal static class Program
                 provider.GetRequiredService<ICharacterIndexManager>(),
                 provider.GetRequiredService<IDownloadService>(),
                 downloadPath));
+                
+        services.AddTransient<CharactersPageScrapingStrategy>(provider => 
+            new CharactersPageScrapingStrategy(
+                provider.GetRequiredService<IWebDriverService>(),
+                provider.GetRequiredService<IWebElementExtractor>(),
+                provider.GetRequiredService<INavigationService>(),
+                provider.GetRequiredService<IProgressReporter>(),
+                provider.GetRequiredService<ICharacterIndexManager>(),
+                provider.GetRequiredService<IDownloadService>(),
+                downloadPath));
         
         services.AddSingleton<IScrapingStrategyFactory>(provider => 
             new ScrapingStrategyFactory(provider));

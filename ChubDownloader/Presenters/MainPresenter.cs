@@ -44,6 +44,9 @@ public sealed class MainPresenter : IDisposable
                 case DownloadMode.SegmentPages when e.Segment.HasValue:
                     await _scrapingOrchestrator.DownloadFromSegmentAsync(e.Segment.Value, e.MinChats, e.StartPage, e.PagesToScan, progress, _cancellationTokenSource.Token);
                     break;
+                case DownloadMode.CharactersPages:
+                    await _scrapingOrchestrator.DownloadFromCharactersPageAsync(e.MinChats, e.StartPage, e.PagesToScan, progress, _cancellationTokenSource.Token);
+                    break;
             }
 
             _progressDisplay.ShowMessage("Загрузка завершена!");

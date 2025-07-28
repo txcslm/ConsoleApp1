@@ -9,6 +9,7 @@ public sealed class WebDriverSettings
     ];
     
     public const string CharacterListSelector = "#chara-list > a.cursor-pointer";
+    public const string CharactersPageSelector = "#chara-list a.cursor-pointer";
     public const string NextPageXPath = "//*[@id='rc-tabs-1-panel-characters']/ul[1]/li[@title='Next Page']";
     public const string AntPaginationNextSelector = ".ant-pagination-next[title='Next Page']";
     public const string AntTooltipInnerSelector = ".ant-tooltip-inner";

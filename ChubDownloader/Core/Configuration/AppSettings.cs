@@ -22,6 +22,7 @@ public sealed class AppSettings
     public const string Characters2FolderName = "characters2";
     public const string Characters3FolderName = "characters3";
     public const string Characters4FolderName = "characters4";
+    public const string Characters5FolderName = "characters5";
     public const string CharacterIndexFileName = "character_index.json";
     
     public const string JsonExtension = ".json";

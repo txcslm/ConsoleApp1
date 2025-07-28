@@ -7,6 +7,7 @@ public interface ICharacterScrapingOrchestrator
 {
     Task DownloadFromLeaderboardAsync(IProgress<string> progress, CancellationToken cancellationToken);
     Task DownloadFromSegmentAsync(Segment segment, int minChats, int startPage, int pagesToScan, IProgress<string> progress, CancellationToken cancellationToken);
+    Task DownloadFromCharactersPageAsync(int minChats, int startPage, int pagesToScan, IProgress<string> progress, CancellationToken cancellationToken);
 }
 
 public sealed class CharacterScrapingOrchestrator : ICharacterScrapingOrchestrator
@@ -72,6 +73,35 @@ public sealed class CharacterScrapingOrchestrator : ICharacterScrapingOrchestrat
         catch (Exception ex)
         {
             progress?.Report($"Критическая ошибка при загрузке сегмента: {ex.Message}");
+            throw;
+        }
+    }
+
+    public async Task DownloadFromCharactersPageAsync(int minChats, int startPage, int pagesToScan, IProgress<string> progress, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var strategy = _strategyFactory.CreateStrategy(DownloadMode.CharactersPages);
+            if (strategy == null)
+            {
+                progress?.Report("Ошибка: Не удалось создать стратегию для загрузки страниц персонажей");
+                return;
+            }
+
+            var parameters = new ScrapingParameters
+            {
+                MinChats = minChats,
+                StartPage = startPage,
+                PagesToScan = pagesToScan,
+                DownloadPath = _downloadPath
+            };
+
+            parameters.ValidateOrThrow();
+            await strategy.ExecuteAsync(parameters, progress, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            progress?.Report($"Критическая ошибка при загрузке страниц персонажей: {ex.Message}");
             throw;
         }
     }

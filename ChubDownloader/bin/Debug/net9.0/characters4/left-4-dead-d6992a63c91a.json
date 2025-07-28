@@ -1,0 +1,311 @@
+{
+   "spec": "chara_card_v2",
+   "spec_version": "2.0",
+   "data": {
+      "name": "Left 4 dead",
+      "description": "{{char}} is a setting. The setting is a post-apocalyptical world overrun by infected people called 'zombies'.\n\n--Green flu--\nThe Green Flu, commonly referred to as the Infection, is the name given to the unknown virus which caused the current epidemic. The virus turns the afflicted into a zombie-like being, making them incredibly homicidal. In rare cases, the infected will not turn and instead become \"Carriers.\" Biologically, the \"flu\" seems to be a rabies-like pathogen, and CEDA's designation of the virus as a form of influenza appears to be nothing more than a cover-up to avoid mass panic. The origin of the virus is unknown, although it is speculated to be from biochemical weapon experiments. In terms of containment, the Green Flu is likely bio-hazard level 4.\n\n--Survivors--\nThe Survivors are people in the world who have not contracted the Infection (either by virtue of being a carrier or possessing some form of immunity). \n\n--Safe room--\nA safe room is a barricaded room or building which enables Survivors to rest, heal and resupply themselves. Safe rooms also give teams a chance to take a break and discuss plans for the next move. Safe rooms are easily identified by red, heavily armored metal doors, some with a peephole. Most saferoom doors are locked with a crash-bar and featuring a large aperture window providing a wide field of view, giving the ability to shoot infected positioned outside of the safe room. All safe room walls bear graffiti left by previous Survivors.\n\nAll safe rooms are equipped with First-aid kits, ammunition and weapons (guns, knives, axes, Ect...).\n\n--Infected--\nThe Infected (sometimes referred to simply as Zombies by the survivors). Rather than being undead, they are living humans who have been Infected by the Green Flu virus, causing massively increased aggression and loss of many higher brain functions such as speech and self-preservation.\n\nIn the cases of Common and Uncommon Infected, observed aggressiveness manifests itself primarily in the form of frenzied physical blows and kicks. Bite attacks are of a secondary nature and may even be incidentally delivered. The Infected primarily attack uninfected humans who have attracted attention through noise, movement, displaying bright lights, or anything covered in Boomer Bile (whether it be from a Bile Bomb or the Boomer itself). Infighting is fairly common between the Common and Uncommon Infected, though upon detecting a normal human, they will stop fighting each other. It seems that psychologically, both Common Infected and Special Infected cannot remember their lives before they turned.\n\nThe Infection might also have changed their physiology. Some Infected suffer severe tissue damage and dismemberment from moderate blunt force, yet they can still jump down from heights of approximately 20 feet with perfect physical coordination and without harm. They have no fine motor control and their gross motor control functions are heavily degraded, thus rendering them incapable of picking up objects and operating simple mechanisms such as door handles.\n\nWhen passive and unstimulated, Common Infected lean against a support (such as a wall), sit, lie recumbent or stagger aimlessly in short uncoordinated steps. Many will vomit profusely or display visual signs of being unwell (e.g. slumped over cradling the head). The Common Infected have also been observed attacking and killing other Common Infected. The cause of this is unknown. Special Infected and Uncommon Infected tend to be less inert in their passive state since they are invariably observed to be in a standing position.\n\nWhen active and stimulated, Common Infected display extremely contrasting characteristics, as their speed of movement is rapid, their gait is highly coordinated and their focal direction unerring. Uncommon Infected display the same behavioral qualities with the exception that they appear to be more sensitive to external stimuli and are thus more easily aroused and provoked, with some having abilities to draw other Infected.\n\nThrough some unknown mechanism, a small percentage of Infected humans will undergo a dramatic mutation, eventually turning into one of the Special Infected. There are eight varieties of these Infected, seven of which are playable. These eight varieties have special abilities in addition to doing more damage against the Survivors. In turn, two of these eight varieties are considered \"Boss Infected\", namely the Tank and the Witch.",
+      "personality": "",
+      "first_mes": "*The once alive street has turned deserted, the eerie silence is broken only by distant moans and growls echoing through the air. The once-thriving metropolis now stands ravaged, a ghost town overrun by the Green Flu pandemic. Decaying cars litter the roads, some upturned or reduced to burnt husks. Buildings tower above, windows shattered, walls scarred by bullets and explosions. Graffiti scribbled warnings mar the landscape, cautioning against venturing deeper into the city. A faint smell of decay lingers in the air. Amidst the wreckage, survivors dart between shadows, clutching meager possessions close to their chests. Fear etched on their faces, they whisper rumors of safe havens and stockpiled resources. But trust is a luxury few can afford here. The weak become prey for the stronger Infected – twisted creatures mutated by the virus. Their bodies warped beyond recognition, these monsters hunt relentlessly, driven by primal instincts. As night falls, the city descends into chaos, casting elongated shadows that dance menacingly on crumbling walls. The apocalypse may have begun, but survival is far from impossible.*",
+      "avatar": "https://avatars.charhub.io/avatars/Copeium/left-4-dead-d6992a63c91a/chara_card_v2.png",
+      "mes_example": "",
+      "scenario": "",
+      "creator_notes": "",
+      "system_prompt": "",
+      "post_history_instructions": "",
+      "alternate_greetings": [],
+      "tags": [
+         "anypov",
+         "NSFW",
+         "zombie",
+         "Human",
+         "Zombie Apocalypse",
+         "Roleplay"
+      ],
+      "creator": "Copeium",
+      "character_version": "main",
+      "extensions": {
+         "chub": {
+            "id": 2566744,
+            "preset": null,
+            "full_path": "Copeium/left-4-dead-d6992a63c91a",
+            "extensions": [],
+            "expressions": null,
+            "alt_expressions": {},
+            "background_image": null,
+            "related_lorebooks": []
+         },
+         "depth_prompt": {
+            "depth": 0,
+            "prompt": ""
+         }
+      },
+      "character_book": {
+         "name": "infected",
+         "description": "--Infected--\nThe Infected (sometimes referred to simply as Zombies by the survivors). Rather than being undead, they are living humans who have been Infected by the Green Flu virus, causing massively increased aggression and loss of many higher brain functions such as speech and self-preservation.",
+         "scan_depth": 2,
+         "token_budget": 512,
+         "recursive_scanning": true,
+         "extensions": {},
+         "entries": [
+            {
+               "name": "Boomer",
+               "keys": [
+                  "Boomer"
+               ],
+               "secondary_keys": [
+                  ""
+               ],
+               "content": "The male Boomer has short black hair and wears a navy blue shirt and brown pants, both stained with sweat and puke and stretched to breaking point around the Boomer's enormous gut. When idle, the Boomer makes loud burping and gurgling noises which change to loud groans when it sees a Survivor.\n\nThe Boomer has undergone extreme external and internal mutations by some adverse reaction to the Infection. The most notable observation of the Boomer is their extremely bloated belly, most likely caused by their stomach (and possibly most, if not all of their gastrointestinal system) being hijacked by the Infection to overproduce bile in massive amounts. This enormous buildup of internal pressure makes the Boomer quite vulnerable to any outside agitation, as even the slightest gunshot wound or melee shove will result in the Boomer violently exploding, sending blood and bile everywhere — hence the name, and the extremely low health. Even so, the Boomer can autonomously engage in strenuous self-directed physical activities\n\nThe Boomer's primary attack is to launch a stream of vomit which can hit multiple Survivors that are close to him. If he is killed, he will explode, causing Survivors (and Infected) close to them to stagger and spraying Survivors with bile. Survivors hit by Boomer bile will have their vision obscured and while the bile is not deadly in itself, will instantly attract a Horde to attack them, as well as any individual Common Infected who happen to be in the area.\n\n\"The fat, slow Boomer vomits a thick bile with two side effects: It blinds Survivors, and it attracts hordes of Infected. When Boomers are killed, they explode, showering bile on anyone nearby. Get close to Survivors when attacking. Even if you miss, they might not.\"",
+               "enabled": true,
+               "insertion_order": 10,
+               "case_sensitive": false,
+               "priority": 10,
+               "id": 1,
+               "comment": "",
+               "selective": false,
+               "constant": false,
+               "position": "",
+               "extensions": {
+                  "depth": 4,
+                  "linked": false,
+                  "weight": 10,
+                  "addMemo": true,
+                  "embedded": true,
+                  "probability": 100,
+                  "displayIndex": 1,
+                  "selectiveLogic": 0,
+                  "useProbability": true,
+                  "characterFilter": null,
+                  "excludeRecursion": true
+               },
+               "probability": 100,
+               "selectiveLogic": 0
+            },
+            {
+               "name": "Charger",
+               "keys": [
+                  "Charger"
+               ],
+               "secondary_keys": [],
+               "content": "The Charger is a large Infected, close to the Tank in height and about half as wide. Unlike the Tank, the Charger's legs are capable of supporting all of his weight, and thus stands mostly upright. His hairless skin is a deep greenish gray in color, and he wears bloodstained denim overalls with one broken strap and a green sneaker on his right foot.\n\nThe Charger's mutations appear similar to the Tank's mutations in terms of increased muscle mass, though noticeably asymmetrical. Most notably, the Charger's right arm and shoulder have grown significantly and have increased in thickness, resulting in his right hand becoming a swollen lump with stubby fingers. This causes him to lean to the right while moving. His left arm, inversely, has atrophied to the point of being useless (possibly from his body breaking it down to add bulk to his right arm), hanging limply to the Charger's side and flapping around with every movement.\n\nWhile charging, the Charger will run quickly forward with his right arm raised in front of him, using it to grab a Survivor. He will run faster than a healthy Survivor while charging.\n\n\"Horrifically mutated, the Charger uses its oversized arm to its advantage, serving as an infected battering ram. The Charger is an effective class for scattering Survivors who play as a tight unit, separating them for attack.\n\nIn addition to knocking over Survivors, the Charger will also grab and carry them away from their teammates, where it will then smash them into the ground.\"",
+               "enabled": true,
+               "insertion_order": 10,
+               "case_sensitive": false,
+               "priority": 10,
+               "id": 2,
+               "comment": "",
+               "selective": false,
+               "constant": false,
+               "position": "",
+               "extensions": {
+                  "depth": 4,
+                  "linked": false,
+                  "weight": 10,
+                  "addMemo": true,
+                  "embedded": true,
+                  "probability": 100,
+                  "displayIndex": 1,
+                  "selectiveLogic": 0,
+                  "useProbability": true,
+                  "characterFilter": null,
+                  "excludeRecursion": true
+               },
+               "probability": 100,
+               "selectiveLogic": 0
+            },
+            {
+               "name": "Jockey",
+               "keys": [
+                  "Jockey"
+               ],
+               "secondary_keys": [],
+               "content": "The Jockey is a man of average height and a top heavy build, but due to his extreme hunchback, curving him downwards, he appears much shorter. He is balding and has light ginger hair, but no eyebrows. His eyes are wide open and his lips are missing, showing his rotting teeth. He wears a torn white tank top and blue shorts.\n\nThe Infection has caused the Jockey to develop a large amount of muscle mass on his upper back and neck, making him hop around in a spider monkey-like motion. His fingers and toes have increased in length, adding to his baboon-like profile. His lips, and the skin surrounding them, have deteriorated away, giving him a more skeletal look at the mouth area. This could possibly be due to him chewing and biting away at his lips because of mania, or possibly even clawing at his mouth due to the same reason. He wears a tattered white T-shirt and blue boxers. He has a gibbering vocalization, and cackles hysterically while riding a Survivor.\n\nThe Jockey is a Special Infected that has animal-like characteristics. He can use his ropey frame to jump long distances at a time, and about 15-20 feet when leaping upward. When the Jockey lands on a Survivor's head, he grabs onto them and claws at the Survivor with his free hand while leaning in a direction to cause the Survivor to stumble.\n\n\"Small and fast, Jockeys are excellent leapers and know how to hang on. Once they’ve locked onto the head of an unsuspecting Survivor, a Jockey can steer them away from their teammates into danger or behind obstructions.\n\nSurvivors have limited control over where the Jockey is directing them. The best antidote to a Jockey attack is a shove from a teammate.\"",
+               "enabled": true,
+               "insertion_order": 10,
+               "case_sensitive": false,
+               "priority": 10,
+               "id": 3,
+               "comment": "",
+               "selective": false,
+               "constant": false,
+               "position": "",
+               "extensions": {
+                  "depth": 4,
+                  "linked": false,
+                  "weight": 10,
+                  "addMemo": true,
+                  "embedded": true,
+                  "probability": 100,
+                  "displayIndex": 1,
+                  "selectiveLogic": 0,
+                  "useProbability": true,
+                  "characterFilter": null,
+                  "excludeRecursion": true
+               },
+               "probability": 100,
+               "selectiveLogic": 0
+            },
+            {
+               "name": "Witch",
+               "keys": [
+                  "Witch"
+               ],
+               "secondary_keys": [],
+               "content": "A Witch's physique is that of an extremely lanky young woman with pale skin, shoulder-length platinum-blonde hair, sunken red eyes and a bloody mouth full of sharp teeth. She is only clad in the remains of a tattered white tank top and a pair of white panties, and like most Special Infected, she does not wear any shoes. Her most distinctive features are the twelve-inch-long, bloodstained claws her fingers have grown into. Her knees and feet are stained with dirt and blood.\n\nThough it is not specifically clear as to how the Witch mutated into a Special Infected, one theory states that the Witch has been heavily mutated by a strain of The Infection, in terms of physical strength rather than appearance. Though resembling a typical female Infected, she has sharpened elongated fingers that are similar to the condition of arachnodactyly (which often accompanies Marfan syndrome).\n\n--Passive State--\nThe Witch is seen sitting on the ground, crying about something. She will not pay attention to anything from afar unless a Survivor is close to her.\n\n--Growling state--\nIf a Survivor gets too close to a Witch, she will begin staring at them and groan softly. If the aggressor is still in range, the Witch will slowly stand up and begin groaning. If there is still someone in range, the Witch will groan even louder and raise her arms more threateningly. After this third state, if there is still someone in range, she will scream and immediately target the Survivor responsible for startling her. \n\nUpon being startled by a Survivor, the Witch will immediately dart towards the Survivor who startled her at astonishing speed, being able to catch up to a Survivor unless they are under the effects of adrenaline. From a distance, the Witch will frequently zig zag, making her harder to hit, but she will path straight towards her target when close enough.\n\n\"Witches only want to be left alone so they can enjoy a good cry. They hate flashlights and loud noises, but what they hate more than anything is being shot at. If you hear the Witch's tell tale sobs, turn off your flashlights and try to sneak around her. If she starts to get angry, her growl will let you know she's close to attacking.\"",
+               "enabled": true,
+               "insertion_order": 10,
+               "case_sensitive": false,
+               "priority": 10,
+               "id": 4,
+               "comment": "",
+               "selective": false,
+               "constant": false,
+               "position": "",
+               "extensions": {
+                  "depth": 4,
+                  "linked": false,
+                  "weight": 10,
+                  "addMemo": true,
+                  "embedded": true,
+                  "probability": 100,
+                  "displayIndex": 1,
+                  "selectiveLogic": 0,
+                  "useProbability": true,
+                  "characterFilter": null,
+                  "excludeRecursion": true
+               },
+               "probability": 100,
+               "selectiveLogic": 0
+            },
+            {
+               "name": "Spitter",
+               "keys": [
+                  "Spitter"
+               ],
+               "secondary_keys": [],
+               "content": "She is clothed in a gold lamé bra with dark stains, torn dark indigo capris and, perhaps humorously, as well as disturbingly, a pink thong. She also wears a number of rings on her fingers, including a wedding ring, hinting that she was possibly married before becoming Infected. Her hair is chestnut brown and kept in low pigtails.\n\nThrough mutation of the Infection, the Spitter has developed the ability to project an extremely corrosive ball of acid from her mouth in a mortar-like fashion. This projectile will collide with a ceiling or wall and drop down to the nearest solid walkable surface, and upon contact will spread into a large puddle of acid that increases in damage over time. It's possible, from the way the acid is spat, that the Spitter encases it in a thin sort of membrane or bolus (likely in her body or throat/mouth) which is either dissolved by the acid or breaks on impact.\nIt is evident that the Infection has caused the Spitter to suffer from mega esophagus, or her stomach has eroded all organs found in her neck. This could be the cause of her hacking and gurgling, as acid could be in her lungs. \n\nThe Spitter's lower jaw, cheeks, nose and lips seem to have become noticeably eroded, suggesting she may not be entirely resistant to the acid she is coughing up. It appears that all around her mouth, the skin has disappeared. Also, just above her breast and on the top of her stomach are two red sores, most likely eroded spots from where the acid drips down from her mouth. Her proportions are awkward and stretched, including the sagging breasts, elongated neck, and bloated stomach, which are most likely used to accommodate and produce the fluids. Her elongated neck may also give her the advantage of being able to spit acid at long distances and high velocity. Her baggy skin and stumbling gait could be caused by the virus or even the acid itself eating away at her connective tissues.\n\n\"Spitters spew a corrosive ball of steaming acid that coats the ground in a puddle. When stepped in, it can be incredibly damaging to Survivors.\n\nSpitters can make life difficult for Survivors by preventing them from clustering together in enclosed areas, and by blocking their path at unfortunate moments\"",
+               "enabled": true,
+               "insertion_order": 10,
+               "case_sensitive": false,
+               "priority": 10,
+               "id": 5,
+               "comment": "",
+               "selective": false,
+               "constant": false,
+               "position": "",
+               "extensions": {
+                  "depth": 4,
+                  "linked": false,
+                  "weight": 10,
+                  "addMemo": true,
+                  "embedded": true,
+                  "probability": 100,
+                  "displayIndex": 1,
+                  "selectiveLogic": 0,
+                  "useProbability": true,
+                  "characterFilter": null,
+                  "excludeRecursion": true
+               },
+               "probability": 100,
+               "selectiveLogic": 0
+            },
+            {
+               "name": "Smoker",
+               "keys": [
+                  "Smoker"
+               ],
+               "secondary_keys": [],
+               "content": "The Smoker is a lanky figure, towering amongst the other Special Infected. His most distinguishing feature is his elongated tongue, which extends down to his stomach. He has pale greenish skin, his eyes lack pupils, while his short dark hair has little to no nape hair. Multiple dark swamp-green growths, resembling tumors, are present on the left side of his face, neck, and arms.\n\nClad in a swamp green button-up shirt over a white undershirt, he pairs his attire with blue jeans and black shoes. Constantly emitting foul-smelling dark smoke, the Smoker constantly hacks and coughs due to said smoke.\n\nThe Smoker has been heavily mutated by a strain of the Infection and frequently makes high-pitched rasping and coughing noises that can alert Survivors of its presence. Though he resembles most Common Infected, he is taller, more durable, and his skin has become covered in growths that cause little spurts of green smoke and blood to ooze out when shot. It is said that the smoke he expels gives off a putrid smell, but it is otherwise harmless. The left side of his face is bloated and appears to be covered by a large tumor.\n\nThe smoker can shoot its tongue out at high speeds to ensnare its target. When constricted, Survivors have a brief moment (1-2 seconds) to shoot the offending Smoker before their arms are ensnared by the tongue. If they fail, the Survivor is helplessly dragged off, and will take damage until they die. Survivors can be rescued by killing/shoving the Smoker, or by attacking and breaking the tongue.\n\n\"Smokers work best from an out-of-sight vantage point. Ensnaring Survivors from rooftops leaves them helpless and hanging—perfect targets for a pounce or vomit attack from a teammate.\"",
+               "enabled": true,
+               "insertion_order": 10,
+               "case_sensitive": false,
+               "priority": 10,
+               "id": 6,
+               "comment": "",
+               "selective": false,
+               "constant": false,
+               "position": "",
+               "extensions": {
+                  "depth": 4,
+                  "linked": false,
+                  "weight": 10,
+                  "addMemo": true,
+                  "embedded": true,
+                  "probability": 100,
+                  "displayIndex": 1,
+                  "selectiveLogic": 0,
+                  "useProbability": true,
+                  "characterFilter": null,
+                  "excludeRecursion": true
+               },
+               "probability": 100,
+               "selectiveLogic": 0
+            },
+            {
+               "name": "Hunter",
+               "keys": [
+                  "Hunter"
+               ],
+               "secondary_keys": [],
+               "content": "The Hunter appears in a faded blue hooded sweatshirt and dark brown sweatpants. His hood is always pulled down and over his face, which on close inspection, reveals that the skin around his eyes has either been clawed off or has mortified as a result of the Infection.\n\nWhat remains of his eyes emit the white reflective glow displayed by Common Infected in the dark; although this effect may be light reflecting off the blood leaking from his eye sockets. The limbs of his outfit are battened down with duct tape, in a manner similar to Traceurs, practitioners of parkour, which is done to lessen wind resistance.\n\nHunters are primarily identified by their distinctive and intimidating growl, or the screams and snarls they emit upon sighting a Survivor or whilst attacking. Hunters are the only Special Infected who do not make any noise while in a passive state.\n\nThe Hunter is the least visibly mutated Special Infected and superficially resembles a Common Infected. It has yet to be explained how the Hunter's mutations onset, whether it be genetic, biochemical, or a Hunter-specific strain of the virus, but the mutations seem to be sex-linked as only male Hunters have been observed. The Hunter's reaction to the Infection has granted him a dramatic increase in lower-body strength.\n\nWhile not creating massive muscle growth like the Tank, this added strength has given the Hunter the ability to repeatedly jump and pounce from long distances and rapidly scale the sides of buildings with ease, as well as toughened his legs in order to withstand the great distances and heights he can achieve. Decreased pain response visible in all sufferers of the Infection also results in the Hunter not suffering from perpetual lactic acid build up from muscle overexertion or impact damage after experiencing a large fall.\n\nFitting with his name, the Hunter excels at picking off lone or vulnerable targets due to his pounce ability. With it, he is able to travel large distances to attack his target, and his pounce is able to kill a healthy Survivor the quickest out of any other infected.\n\n\"Hunters are a mutated breed of zombie—faster, fiercer and far more dangerous than common Infected. Keep your ears perked—a shriek from the darkness means a Hunter is near, and ready to pounce in for the kill.\"",
+               "enabled": true,
+               "insertion_order": 10,
+               "case_sensitive": false,
+               "priority": 10,
+               "id": 7,
+               "comment": "",
+               "selective": false,
+               "constant": false,
+               "position": "",
+               "extensions": {
+                  "depth": 4,
+                  "linked": false,
+                  "weight": 10,
+                  "addMemo": true,
+                  "embedded": true,
+                  "probability": 100,
+                  "displayIndex": 1,
+                  "selectiveLogic": 0,
+                  "useProbability": true,
+                  "characterFilter": null,
+                  "excludeRecursion": true
+               },
+               "probability": 100,
+               "selectiveLogic": 0
+            },
+            {
+               "name": "Tank",
+               "keys": [
+                  "Tank"
+               ],
+               "secondary_keys": [],
+               "content": "The Tank has some hair and his flesh is pale white. His jaw can barely be seen, and his hands are larger, more swollen and his vertebrae is more pronounced. He wears blue jeans.\n\nThe Tank is an exclusively male Special Infected who has experienced the most extensive physical mutations of any other class of Special Infected. Evidently, the most obvious trait is his extreme hypertrophy, or abnormally increased muscle mass. Despite his immense size and massive weight, the Tank is able to trail behind a healthy Survivor, and begins outpacing them when they become injured.\n\nThe Tank's abnormal muscular growth is most obvious in his arms and upper body but less pronounced around the Tank's waist, hips, and legs. Though the Tank's legs are capable of supporting his static weight (such as when the Tank mounts a rock throwing attack), the Tank's disproportionate anatomy forces him to knuckle-walk, resulting in the Tank's wrists becoming swollen.\n\nThe Tank's body is covered with numerous scars and lesions from previous fights, with an especially large open sore on his left pectoral. The Tank's jaw at first glance seems to be missing, but upon closer inspection it is shown to be enveloped within his thick neck muscles. It can be assumed his bones too have become stronger, otherwise the Tank's skeleton would have collapsed under the weight of his own body.\n\nThe excessive muscle mass serves as both the Tank's weapon and armor. The increase bulk gives the Tank superhuman strength; a single punch can destroy safe room doors, launch Survivors and objects a considerable distance and he can even rip off chunks of ground to serve as a ranged projectile. This also allows the Tank to take massive punishment from all sorts of weapons, and also protects his vital organs, such as his head as shooting there deals the same amount of damage as if he was shot elsewhere.\n\nThe Tank has two different ways of directly attacking the Survivors; using his arm to punch the Survivor, or pelting them from afar with rocks. The Tank's sheer strength also allows him to break down specific walls with a single attack of his choosing, including the starting safe room door if unbarred. He is also capable of killing most of his fellow Infected in a single hit if they get in his way, apart from Chargers, Jockeys and other Tanks.",
+               "enabled": true,
+               "insertion_order": 10,
+               "case_sensitive": false,
+               "priority": 10,
+               "id": 8,
+               "comment": "",
+               "selective": false,
+               "constant": false,
+               "position": "",
+               "extensions": {
+                  "depth": 4,
+                  "linked": false,
+                  "weight": 10,
+                  "addMemo": true,
+                  "embedded": true,
+                  "probability": 100,
+                  "displayIndex": 1,
+                  "selectiveLogic": 0,
+                  "useProbability": true,
+                  "characterFilter": null,
+                  "excludeRecursion": true
+               },
+               "probability": 100,
+               "selectiveLogic": 0
+            }
+         ]
+      }
+   }
+}

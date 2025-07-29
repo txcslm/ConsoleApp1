@@ -1,5 +1,7 @@
 using ChubDownloader.Models;
 using ChubDownloader.Services.Strategies;
+using ChubDownloader.Infrastructure.WebDriver;
+using ChubDownloader.Infrastructure.Logging;
 
 namespace ChubDownloader.Services;
 
@@ -26,11 +28,6 @@ public sealed class CharacterScrapingOrchestrator : ICharacterScrapingOrchestrat
         try
         {
             var strategy = _strategyFactory.CreateStrategy(DownloadMode.Leaderboard);
-            if (strategy == null)
-            {
-                progress?.Report("Ошибка: Не удалось создать стратегию для загрузки лидерборда");
-                return;
-            }
 
             var parameters = new ScrapingParameters
             {
@@ -42,7 +39,16 @@ public sealed class CharacterScrapingOrchestrator : ICharacterScrapingOrchestrat
         }
         catch (Exception ex)
         {
-            progress?.Report($"Критическая ошибка при загрузке лидерборда: {ex.Message}");
+            if (WebDriverResilience.IsRecoverableWebDriverError(ex))
+            {
+                StringBuilderLogger.LogWarning("Ошибка WebDriver при загрузке лидерборда - попробуйте перезапустить", ex);
+                progress?.Report("⚠️ Ошибка WebDriver - попробуйте перезапустить приложение");
+            }
+            else
+            {
+                StringBuilderLogger.LogError($"Критическая ошибка при загрузке лидерборда: {ex.Message}", ex);
+                progress?.Report($"Критическая ошибка при загрузке лидерборда: {ex.Message}");
+            }
             throw;
         }
     }
@@ -52,11 +58,6 @@ public sealed class CharacterScrapingOrchestrator : ICharacterScrapingOrchestrat
         try
         {
             var strategy = _strategyFactory.CreateStrategy(DownloadMode.SegmentPages);
-            if (strategy == null)
-            {
-                progress?.Report("Ошибка: Не удалось создать стратегию для загрузки сегмента");
-                return;
-            }
 
             var parameters = new ScrapingParameters
             {
@@ -72,7 +73,16 @@ public sealed class CharacterScrapingOrchestrator : ICharacterScrapingOrchestrat
         }
         catch (Exception ex)
         {
-            progress?.Report($"Критическая ошибка при загрузке сегмента: {ex.Message}");
+            if (WebDriverResilience.IsRecoverableWebDriverError(ex))
+            {
+                StringBuilderLogger.LogWarning("Ошибка WebDriver при загрузке сегмента - попробуйте перезапустить", ex);
+                progress?.Report("⚠️ Ошибка WebDriver - попробуйте перезапустить приложение");
+            }
+            else
+            {
+                StringBuilderLogger.LogError($"Критическая ошибка при загрузке сегмента: {ex.Message}", ex);
+                progress?.Report($"Критическая ошибка при загрузке сегмента: {ex.Message}");
+            }
             throw;
         }
     }
@@ -82,11 +92,6 @@ public sealed class CharacterScrapingOrchestrator : ICharacterScrapingOrchestrat
         try
         {
             var strategy = _strategyFactory.CreateStrategy(DownloadMode.CharactersPages);
-            if (strategy == null)
-            {
-                progress?.Report("Ошибка: Не удалось создать стратегию для загрузки страниц персонажей");
-                return;
-            }
 
             var parameters = new ScrapingParameters
             {
@@ -101,7 +106,16 @@ public sealed class CharacterScrapingOrchestrator : ICharacterScrapingOrchestrat
         }
         catch (Exception ex)
         {
-            progress?.Report($"Критическая ошибка при загрузке страниц персонажей: {ex.Message}");
+            if (WebDriverResilience.IsRecoverableWebDriverError(ex))
+            {
+                StringBuilderLogger.LogWarning("Ошибка WebDriver при загрузке страниц персонажей - попробуйте перезапустить", ex);
+                progress?.Report("⚠️ Ошибка WebDriver - попробуйте перезапустить приложение");
+            }
+            else
+            {
+                StringBuilderLogger.LogError($"Критическая ошибка при загрузке страниц персонажей: {ex.Message}", ex);
+                progress?.Report($"📊 Критическая ошибка при загрузке страниц персонажей: {ex.Message}");
+            }
             throw;
         }
     }

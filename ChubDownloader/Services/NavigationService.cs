@@ -1,5 +1,6 @@
 using OpenQA.Selenium;
 using ChubDownloader.Infrastructure.WebDriver;
+using ChubDownloader.Infrastructure.Logging;
 using ChubDownloader.Core.Configuration;
 using ChubDownloader.Core.Extensions;
 using ZLinq;
@@ -25,13 +26,16 @@ public sealed class NavigationService : INavigationService
 
     public async Task NavigateToAsync(string url)
     {
-        _webDriverService.NavigateTo(url);
-        await Task.CompletedTask;
+        await WebDriverResilience.ExecuteWithRetryAsync(
+            () => Task.Run(() => _webDriverService.NavigateTo(url)),
+            $"навигация к {url}");
     }
 
-    public Task<bool> WaitForElementAsync(By selector, int timeoutSeconds = AppSettings.WebDriverTimeoutSeconds)
+    public async Task<bool> WaitForElementAsync(By selector, int timeoutSeconds = AppSettings.WebDriverTimeoutSeconds)
     {
-        return Task.FromResult(_webDriverService.WaitForElement(selector, timeoutSeconds));
+        return await WebDriverResilience.ExecuteWithRetryAsync(
+            () => Task.FromResult(_webDriverService.WaitForElement(selector, timeoutSeconds)),
+            $"ожидание элемента {selector}");
     }
 
     public bool GoToNextPage()

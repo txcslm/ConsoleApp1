@@ -126,11 +126,7 @@ public sealed class FileSystemService : IFileSystemService
                 {
                     var destFile = Path.Combine(targetPath, characterId + extension);
                     
-                    if (CharacterExists([targetPath, AppSettings.CharactersFolderName, AppSettings.Characters2FolderName, AppSettings.Characters3FolderName, AppSettings.FollowersFolderName, AppSettings.Characters4FolderName], characterId, extension))
-                    {
-                        StringBuilderLogger.WriteDuplicateInfo(characterId);
-                        return false;
-                    }
+                    // Проверка дубликатов теперь происходит в стратегиях
                     
                     File.Move(sourceFile.FullName, destFile);
                     return true;

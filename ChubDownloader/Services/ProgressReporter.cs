@@ -9,7 +9,7 @@ public interface IProgressReporter
     void ReportUserProgress(IProgress<string> progress, int currentUser, int totalUsers, string userName);
     void ReportPageProgress(IProgress<string> progress, int currentPage, int totalPages);
     void ReportCharacterProgress(IProgress<string> progress, string characterId, int chatCount);
-    void ReportError(IProgress<string> progress, string error);
+    void ReportError(IProgress<string> progress, string? error);
 }
 
 public sealed class ProgressReporter : IProgressReporter
@@ -54,12 +54,19 @@ public sealed class ProgressReporter : IProgressReporter
         sb.Clear();
         sb.Append(characterId ?? "Unknown");
         sb.Append(" (чатов: ");
-        sb.Append(chatCount);
+        if (chatCount == int.MaxValue)
+        {
+            sb.Append("без ограничений");
+        }
+        else
+        {
+            sb.Append(chatCount);
+        }
         sb.Append(')');
         progress?.Report(sb.ToString());
     }
 
-    public void ReportError(IProgress<string> progress, string error)
+    public void ReportError(IProgress<string> progress, string? error)
     {
         var sb = ThreadLocalStringBuilder.Value!;
         sb.Clear();

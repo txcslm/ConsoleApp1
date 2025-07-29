@@ -94,6 +94,14 @@ public sealed class SegmentScrapingStrategy : IScrapingStrategy
 
             try
             {
+                // Проверяем, не является ли персонаж дубликатом
+                if (await _indexManager.IsCharacterExistsAsync(id))
+                {
+                    StringBuilderLogger.WriteDuplicateInfo(id);
+                    StringBuilderLogger.LogInfo($"{id} пропущен - уже существует");
+                    continue;
+                }
+                
                 _progressReporter.ReportCharacterProgress(progress, id, chatCount);
 
                 await _navigationService.NavigateToAsync(href);

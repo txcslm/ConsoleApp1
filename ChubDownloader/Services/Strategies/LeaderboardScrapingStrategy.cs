@@ -132,6 +132,14 @@ public sealed class LeaderboardScrapingStrategy : IScrapingStrategy
         foreach (var (href, id) in allCharacterUrls)
         {
             if (cancellationToken.IsCancellationRequested) break;
+            
+            // Проверяем, не является ли персонаж дубликатом
+            if (await _indexManager.IsCharacterExistsAsync(id))
+            {
+                StringBuilderLogger.WriteDuplicateInfo(id);
+                StringBuilderLogger.LogInfo($"{id} пропущен - уже существует");
+                continue;
+            }
 
             await _navigationService.NavigateToAsync(href);
 

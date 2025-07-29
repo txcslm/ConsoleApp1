@@ -38,7 +38,7 @@ public sealed class CharactersPageScrapingStrategy : IScrapingStrategy
     {
         var root = Path.Combine(Environment.CurrentDirectory, AppSettings.Characters5FolderName);
         Directory.CreateDirectory(root);
-        _progressReporter.ReportProgress(progress, $"📁 Создана папка: {root}");
+        StringBuilderLogger.LogInfo($"Создана папка: {root}");
 
         var checkChatCount = parameters.MinChats > 0;
         var endPage = parameters.StartPage + parameters.PagesToScan - 1;
@@ -67,7 +67,7 @@ public sealed class CharactersPageScrapingStrategy : IScrapingStrategy
                 continue;
             }
             var waitTime = DateTime.Now - waitStart;
-            _progressReporter.ReportProgress(progress, $"✅ Элементы загружены за: {waitTime.TotalSeconds:F1}с");
+            StringBuilderLogger.LogInfo($"Элементы загружены за: {waitTime.TotalSeconds:F1}с");
 
             try
             {
@@ -84,11 +84,11 @@ public sealed class CharactersPageScrapingStrategy : IScrapingStrategy
         }
 
         var totalPages = endPage - parameters.StartPage + 1;
-        _progressReporter.ReportProgress(progress, $"🎉 Сканирование завершено!");
-        _progressReporter.ReportProgress(progress, $"📈 Итоговая статистика:");
-        _progressReporter.ReportProgress(progress, $"   • Обработано страниц: {totalPages}");
-        _progressReporter.ReportProgress(progress, $"   • Персонажей на странице: до 50 (вместо 20)");
-        _progressReporter.ReportProgress(progress, $"   • Проверка файлов в папке: {Path.Combine(Environment.CurrentDirectory, AppSettings.Characters5FolderName)}");
+        StringBuilderLogger.LogInfo("Сканирование завершено!");
+        StringBuilderLogger.LogInfo("Итоговая статистика:");
+        StringBuilderLogger.LogInfo($"  • Обработано страниц: {totalPages}");
+        StringBuilderLogger.LogInfo("  • Персонажей на странице: до 50 (вместо 20)");
+        StringBuilderLogger.LogInfo($"  • Проверка файлов в папке: {Path.Combine(Environment.CurrentDirectory, AppSettings.Characters5FolderName)}");
     }
 
     private static string BuildCharactersPageUrl(int page)
@@ -142,7 +142,16 @@ public sealed class CharactersPageScrapingStrategy : IScrapingStrategy
 
             try
             {
-                _progressReporter.ReportProgress(progress, $"📥 [{characterNumber}/{totalCharacters}] Загружаем: {id} (чатов: {chatCount})");
+                // Проверяем, не является ли персонаж дубликатом
+                if (await _indexManager.IsCharacterExistsAsync(id))
+                {
+                    StringBuilderLogger.WriteDuplicateInfo(id);
+                    StringBuilderLogger.LogInfo($"[{characterNumber}/{totalCharacters}] {id} пропущен - уже существует");
+                    continue;
+                }
+                
+                var chatDisplay = chatCount == int.MaxValue ? "без ограничений" : chatCount.ToString();
+                _progressReporter.ReportProgress(progress, $"📥 [{characterNumber}/{totalCharacters}] Загружаем: {id} (чатов: {chatDisplay})");
 
                 var navStart = DateTime.Now;
                 await _navigationService.NavigateToAsync(href);

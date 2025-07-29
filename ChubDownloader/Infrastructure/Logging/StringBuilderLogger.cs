@@ -18,6 +18,7 @@ public static class StringBuilderLogger
     private const string ErrorColor = "\u001b[31m";
     private const string WarningColor = "\u001b[33m";
     private const string InfoColor = "\u001b[34m";
+    private const string DuplicateColor = "\u001b[35m"; // Фиолетовый
     private const string ResetColor = "\u001b[0m";
 
     public static void WriteLine(string message)
@@ -237,10 +238,15 @@ public static class StringBuilderLogger
     {
         lock (_lock)
         {
+            var timestamp = DateTime.Now.ToString("HH:mm:ss");
             _stringBuilder.Clear();
-            _stringBuilder.Append("[DUPLICATE] Character ");
+            _stringBuilder.Append(DuplicateColor);
+            _stringBuilder.Append("🔁 [DUPLICATE] ");
+            _stringBuilder.Append(timestamp);
+            _stringBuilder.Append(" - Character ");
             _stringBuilder.Append(characterId);
             _stringBuilder.Append(" already exists. Skipping download.");
+            _stringBuilder.Append(ResetColor);
             Console.WriteLine(_stringBuilder.ToString());
         }
     }

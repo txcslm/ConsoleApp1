@@ -4,6 +4,8 @@ using ChubDownloader.Services;
 using ChubDownloader.Services.Strategies;
 using ChubDownloader.Infrastructure.WebDriver;
 using ChubDownloader.Infrastructure.FileSystem;
+using ChubDownloader.Infrastructure.Logging;
+using ChubDownloader.Infrastructure.Performance;
 using ChubDownloader.Core.Configuration;
 using ChubDownloader.Core.DependencyInjection;
 
@@ -41,7 +43,7 @@ internal static class Program
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error during cleanup: {ex.Message}");
+                StringBuilderLogger.LogError($"Error during cleanup: {ex.Message}", ex);
             }
         }
     }

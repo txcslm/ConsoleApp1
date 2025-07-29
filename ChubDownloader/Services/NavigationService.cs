@@ -1,6 +1,8 @@
 using OpenQA.Selenium;
 using ChubDownloader.Infrastructure.WebDriver;
 using ChubDownloader.Core.Configuration;
+using ChubDownloader.Core.Extensions;
+using ZLinq;
 
 namespace ChubDownloader.Services;
 
@@ -36,8 +38,8 @@ public sealed class NavigationService : INavigationService
     {
         try
         {
-            var nextButton = _webDriverService.FindElements(By.XPath(WebDriverSettings.NextPageXPath)).FirstOrDefault() ??
-                             _webDriverService.FindElements(By.CssSelector(WebDriverSettings.AntPaginationNextSelector)).FirstOrDefault();
+            var nextButton = _webDriverService.FindElements(By.XPath(WebDriverSettings.NextPageXPath)).FirstOrDefaultOptimized(_ => true) ??
+                             _webDriverService.FindElements(By.CssSelector(WebDriverSettings.AntPaginationNextSelector)).FirstOrDefaultOptimized(_ => true);
 
             if (nextButton != null && nextButton.GetAttribute("aria-disabled") != "true")
             {

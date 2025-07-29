@@ -2,6 +2,7 @@ using OpenQA.Selenium;
 using ChubDownloader.Infrastructure.WebDriver;
 using ChubDownloader.Core.Configuration;
 using ChubDownloader.Core.Extensions;
+using ChubDownloader.Infrastructure.Logging;
 
 namespace ChubDownloader.Services.Strategies;
 
@@ -77,8 +78,8 @@ public sealed class CharactersPageScrapingStrategy : IScrapingStrategy
             }
             catch (Exception ex)
             {
+                StringBuilderLogger.LogError($"Ошибка обработки страницы {page}: {ex.Message}", ex);
                 _progressReporter.ReportError(progress, $"❌ Ошибка обработки страницы {page}: {ex.Message}");
-                _progressReporter.ReportProgress(progress, $"🔍 Stack trace: {ex.StackTrace}");
             }
         }
 
@@ -171,12 +172,13 @@ public sealed class CharactersPageScrapingStrategy : IScrapingStrategy
                 
                 if (backNavTime.TotalSeconds > 2)
                 {
-                    _progressReporter.ReportProgress(progress, $"⚠️ Медленная навигация назад: {backNavTime.TotalSeconds:F1}с");
+                    StringBuilderLogger.LogWarning($"Медленная навигация назад: {backNavTime.TotalSeconds:F1}с");
                 }
             }
             catch (Exception ex)
             {
                 failCount++;
+                StringBuilderLogger.LogError($"Ошибка с {id}: {ex.Message}", ex);
                 _progressReporter.ReportError(progress, $"❌ [{characterNumber}/{totalCharacters}] Ошибка с {id}: {ex.Message}");
             }
         }
@@ -210,15 +212,15 @@ public sealed class CharactersPageScrapingStrategy : IScrapingStrategy
                 var result = await _downloadService.WaitForFileDownloadAsync(_downloadPath, targetDir, characterId, AppSettings.JsonExtension);
                 var waitTime = DateTime.Now - waitStart;
 
-                Console.WriteLine($"🔧 {characterId}: delay={delayTime.TotalMilliseconds:F0}мс, clear={clearTime.TotalMilliseconds:F0}мс, find={findBtnTime.TotalMilliseconds:F0}мс, click={clickTime.TotalMilliseconds:F0}мс, wait={waitTime.TotalSeconds:F1}с");
+                StringBuilderLogger.WriteTiming(characterId, delayTime.TotalMilliseconds, clearTime.TotalMilliseconds, findBtnTime.TotalMilliseconds, clickTime.TotalMilliseconds, waitTime.TotalSeconds);
                 return result;
             }
 
-            Console.WriteLine($"❌ JSON-кнопка не найдена для {characterId} (поиск занял {findBtnTime.TotalMilliseconds:F0}мс)");
+            StringBuilderLogger.WriteFormattedLine("❌ JSON-кнопка не найдена для {0} (поиск занял {1:F0}мс)", characterId, findBtnTime.TotalMilliseconds);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Ошибка загрузки JSON для {characterId}: {ex.Message}");
+            StringBuilderLogger.LogError($"Ошибка загрузки JSON для {characterId}: {ex.Message}", ex);
         }
 
         return false;

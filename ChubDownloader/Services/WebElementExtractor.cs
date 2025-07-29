@@ -4,6 +4,8 @@ using ChubDownloader.Infrastructure.WebDriver;
 using ChubDownloader.Core.Configuration;
 using ChubDownloader.Core.Extensions;
 using System.Text;
+using ChubDownloader.Infrastructure.Logging;
+using ZLinq;
 
 namespace ChubDownloader.Services;
 
@@ -30,7 +32,7 @@ public sealed class WebElementExtractor : IWebElementExtractor
 
     public IWebElement? TryFindJsonButton()
     {
-        Console.WriteLine($"🔍 Поиск JSON кнопки среди {WebDriverSettings.JsonButtonXPaths.Length} селекторов...");
+        StringBuilderLogger.WriteFormattedLine("🔍 Поиск JSON кнопки среди {0} селекторов...", WebDriverSettings.JsonButtonXPaths.Length);
         
         for (int i = 0; i < WebDriverSettings.JsonButtonXPaths.Length; i++)
         {
@@ -41,25 +43,25 @@ public sealed class WebElementExtractor : IWebElementExtractor
                 var element = _webDriverService.Driver.FindElement(By.XPath(xpath));
                 var findTime = DateTime.Now - findStart;
                 
-                Console.WriteLine($"🔍 Селектор {i + 1}: найден элемент за {findTime.TotalMilliseconds:F0}мс");
+                StringBuilderLogger.WriteFormattedLine("🔍 Селектор {0}: найден элемент за {1:F0}мс", i + 1, findTime.TotalMilliseconds);
                 
                 if (element.Displayed && element.Enabled)
                 {
-                    Console.WriteLine($"✅ JSON кнопка найдена с селектором {i + 1}: {xpath}");
+                    StringBuilderLogger.WriteFormattedLine("✅ JSON кнопка найдена с селектором {0}: {1}", i + 1, xpath);
                     return element;
                 }
                 else
                 {
-                    Console.WriteLine($"⚠️ Селектор {i + 1}: элемент найден, но недоступен (Displayed: {element.Displayed}, Enabled: {element.Enabled})");
+                    StringBuilderLogger.WriteFormattedLine("⚠️ Селектор {0}: элемент найден, но недоступен (Displayed: {1}, Enabled: {2})", i + 1, element.Displayed, element.Enabled);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Селектор {i + 1} не сработал: {ex.GetType().Name}");
+                StringBuilderLogger.LogWarning($"Селектор {i + 1} не сработал: {ex.GetType().Name}", ex);
             }
         }
         
-        Console.WriteLine($"❌ JSON кнопка не найдена ни с одним из {WebDriverSettings.JsonButtonXPaths.Length} селекторов");
+        StringBuilderLogger.WriteFormattedLine("❌ JSON кнопка не найдена ни с одним из {0} селекторов", WebDriverSettings.JsonButtonXPaths.Length);
         return null;
     }
 
@@ -74,7 +76,7 @@ public sealed class WebElementExtractor : IWebElementExtractor
             Thread.Sleep(AppSettings.TooltipDelayMs);
 
             var tooltip = _webDriverService.Driver.FindElements(By.CssSelector(WebDriverSettings.AntTooltipInnerSelector))
-                .FirstOrDefault(el => el.Displayed);
+                .FirstOrDefaultOptimized(el => el.Displayed);
 
             if (tooltip != null)
             {
@@ -115,7 +117,7 @@ public sealed class WebElementExtractor : IWebElementExtractor
 
     public async Task<List<(string href, string id, int chatCount)>> ExtractCharacterInfosAsync(IList<IWebElement> cards, int minChats, bool checkChatCount, ICharacterIndexManager indexManager)
     {
-        Console.WriteLine($"🔍 Извлекаем информацию из {cards.Count} карточек (минимум чатов: {minChats}, проверка чатов: {checkChatCount})");
+        StringBuilderLogger.WriteFormattedLine("🔍 Извлекаем информацию из {0} карточек (минимум чатов: {1}, проверка чатов: {2})", cards.Count, minChats, checkChatCount);
         
         var characterInfos = new List<(string href, string id, int chatCount)>(cards.Count);
         var candidateIds = new List<string>(cards.Count);
@@ -143,7 +145,7 @@ public sealed class WebElementExtractor : IWebElementExtractor
                     else
                     {
                         skippedByChats++;
-                        Console.WriteLine($"⚠️ Пропущен {id}: недостаточно чатов ({chatCount} < {minChats})");
+                        StringBuilderLogger.LogWarning($"Пропущен {id}: недостаточно чатов ({chatCount} < {minChats})");
                     }
                 }
                 else
@@ -154,18 +156,20 @@ public sealed class WebElementExtractor : IWebElementExtractor
             catch (Exception ex)
             {
                 invalidCards++;
-                Console.WriteLine($"❌ Ошибка обработки карточки: {ex.Message}");
+                StringBuilderLogger.LogError($"Ошибка обработки карточки: {ex.Message}", ex);
             }
         }
         var extractTime = DateTime.Now - extractStart;
         
-        Console.WriteLine($"📊 Первый проход: найдено {candidateInfos.Count} кандидатов, пропущено по чатам: {skippedByChats}, невалидных: {invalidCards} за {extractTime.TotalSeconds:F1}с");
+        StringBuilderLogger.WriteFormattedLine("📊 Первый проход: найдено {0} кандидатов, пропущено по чатам: {1}, невалидных: {2} за {3:F1}с", candidateInfos.Count, skippedByChats, invalidCards, extractTime.TotalSeconds);
 
         var checkStart = DateTime.Now;
-        var existenceResults = await Task.WhenAll(candidateIds.Select(indexManager.IsCharacterExistsAsync));
+        var tasks = new List<Task<bool>>();
+        candidateIds.AsValueEnumerable().Select(indexManager.IsCharacterExistsAsync).CopyTo(tasks);
+        var existenceResults = await Task.WhenAll(tasks);
         var checkTime = DateTime.Now - checkStart;
         
-        Console.WriteLine($"🔍 Проверка существования {candidateIds.Count} персонажей заняла: {checkTime.TotalSeconds:F1}с");
+        StringBuilderLogger.WriteFormattedLine("🔍 Проверка существования {0} персонажей заняла: {1:F1}с", candidateIds.Count, checkTime.TotalSeconds);
         
         var alreadyExists = 0;
         for (int i = 0; i < candidateInfos.Count; i++)
@@ -177,11 +181,11 @@ public sealed class WebElementExtractor : IWebElementExtractor
             else
             {
                 alreadyExists++;
-                Console.WriteLine($"⚠️ Персонаж {candidateInfos[i].id} уже существует в индексе");
+                StringBuilderLogger.LogInfo($"Персонаж {candidateInfos[i].id} уже существует в индексе");
             }
         }
 
-        Console.WriteLine($"✅ Финальный результат: {characterInfos.Count} новых персонажей (существующих: {alreadyExists})");
+        StringBuilderLogger.WriteFormattedLine("✅ Финальный результат: {0} новых персонажей (существующих: {1})", characterInfos.Count, alreadyExists);
         return characterInfos;
     }
 
@@ -210,7 +214,9 @@ public sealed class WebElementExtractor : IWebElementExtractor
             }
         }
 
-        var existenceResults = await Task.WhenAll(candidateIds.Select(indexManager.IsCharacterExistsAsync));
+        var tasks = new List<Task<bool>>();
+        candidateIds.AsValueEnumerable().Select(indexManager.IsCharacterExistsAsync).CopyTo(tasks);
+        var existenceResults = await Task.WhenAll(tasks);
         
         for (int i = 0; i < candidateUrls.Count; i++)
         {

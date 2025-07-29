@@ -9,11 +9,11 @@ public interface IScrapingStrategy
 
 public sealed class ScrapingParameters
 {
-    public Segment? Segment { get; set; }
-    public int MinChats { get; set; }
-    public int StartPage { get; set; } = 1;
-    public int PagesToScan { get; set; } = 1;
-    public string DownloadPath { get; set; } = string.Empty;
+    public Segment? Segment { get; init; }
+    public int MinChats { get; init; }
+    public int StartPage { get; init; } = 1;
+    public int PagesToScan { get; init; } = 1;
+    public string DownloadPath { get; init; } = string.Empty;
 
     public bool IsValid()
     {

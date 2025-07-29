@@ -1,4 +1,5 @@
 using System.Globalization;
+using ZLinq;
 
 namespace ChubDownloader.Core.Extensions;
 
@@ -10,7 +11,7 @@ public static class StringExtensions
             return 0;
             
         var parts = text.Split(',');
-        var chatPart = parts.FirstOrDefault(p => p.Contains("chats"));
+        var chatPart = parts.AsValueEnumerable().Where(p => p.Contains("chats")).FirstOrDefault();
         if (chatPart == null) return 0;
 
         var numStr = chatPart.Replace("Total:", "")
@@ -18,20 +19,17 @@ public static class StringExtensions
             .Trim()
             .ToLower();
 
-        if (numStr.EndsWith("k"))
+        if (numStr.EndsWith($"k"))
         {
             if (double.TryParse(numStr.TrimEnd('k'), CultureInfo.InvariantCulture, out var val))
                 return (int)(val * 1000);
         }
 
-        if (int.TryParse(numStr, out var result))
-            return result;
-
-        return 0;
+        return int.TryParse(numStr, out var result) ? result : 0;
     }
     
     public static string ExtractCharacterId(this string? href)
     {
-        return href?.TrimEnd('/').Split('/').Last() ?? string.Empty;
+        return string.IsNullOrEmpty(href) ? string.Empty : href.ExtractCharacterIdOptimized();
     }
 }

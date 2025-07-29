@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
 using ChubDownloader.Core.Configuration;
+using ChubDownloader.Infrastructure.Logging;
 
 namespace ChubDownloader.Infrastructure.FileSystem;
 
@@ -127,7 +128,7 @@ public sealed class FileSystemService : IFileSystemService
                     
                     if (CharacterExists([targetPath, AppSettings.CharactersFolderName, AppSettings.Characters2FolderName, AppSettings.Characters3FolderName, AppSettings.FollowersFolderName, AppSettings.Characters4FolderName], characterId, extension))
                     {
-                        Console.WriteLine($"[DUPLICATE] Character {characterId} already exists. Skipping download.");
+                        StringBuilderLogger.WriteDuplicateInfo(characterId);
                         return false;
                     }
                     

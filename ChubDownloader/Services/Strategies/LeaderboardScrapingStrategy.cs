@@ -2,6 +2,7 @@ using OpenQA.Selenium;
 using ChubDownloader.Infrastructure.WebDriver;
 using ChubDownloader.Core.Configuration;
 using ChubDownloader.Core.Extensions;
+using ChubDownloader.Infrastructure.Logging;
 
 namespace ChubDownloader.Services.Strategies;
 
@@ -75,6 +76,7 @@ public sealed class LeaderboardScrapingStrategy : IScrapingStrategy
             }
             catch (Exception ex)
             {
+                StringBuilderLogger.LogError($"Ошибка обработки пользователя {userName}: {ex.Message}", ex);
                 _progressReporter.ReportError(progress, $"Ошибка обработки пользователя {userName}: {ex.Message}");
             }
         }
@@ -158,11 +160,11 @@ public sealed class LeaderboardScrapingStrategy : IScrapingStrategy
                 return await _downloadService.WaitForFileDownloadAsync(_downloadPath, targetDir, characterId, AppSettings.JsonExtension);
             }
 
-            Console.WriteLine($"JSON-кнопка не найдена для {characterId}");
+            StringBuilderLogger.LogWarning($"JSON-кнопка не найдена для {characterId}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Ошибка загрузки JSON: {ex.Message}");
+            StringBuilderLogger.LogError($"Ошибка загрузки JSON для {characterId}: {ex.Message}", ex);
         }
 
         return false;

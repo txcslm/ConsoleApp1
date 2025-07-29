@@ -4,7 +4,7 @@ public sealed class AppSettings
 {
   public const int DefaultDebugPort = 9222;
   public const int DownloadWaitMaxMs = 3000; // Уменьшено с 5000
-  public const int DownloadCheckIntervalMs = 50; // Уменьшено с 100
+  public const int DownloadCheckIntervalMs = 100; // Уменьшено с 100
   public const int FileStableCheckDelayMs = 100; // Уменьшено с 200
   public const int RecentFileSeconds = 5; // Уменьшено с 10
   public const int OldFileAgeMinutes = 2; // Уменьшено с 5

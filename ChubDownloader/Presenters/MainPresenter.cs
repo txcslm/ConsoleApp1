@@ -1,6 +1,7 @@
 using ChubDownloader.Models;
 using ChubDownloader.Services;
 using ChubDownloader.Views;
+using ChubDownloader.Infrastructure.Logging;
 
 namespace ChubDownloader.Presenters;
 
@@ -57,6 +58,7 @@ public sealed class MainPresenter : IDisposable
         }
         catch (Exception ex)
         {
+            StringBuilderLogger.LogError($"Ошибка: {ex.Message}", ex);
             _progressDisplay.ShowError($"Ошибка: {ex.Message}");
         }
         finally
@@ -72,11 +74,10 @@ public sealed class MainPresenter : IDisposable
 
     public void Dispose()
     {
-        if (!_disposed)
-        {
-            _userInteraction.DownloadRequested -= OnDownloadRequested;
-            _cancellationTokenSource?.Dispose();
-            _disposed = true;
-        }
+        if (_disposed)
+            return;
+        _userInteraction.DownloadRequested -= OnDownloadRequested;
+        _cancellationTokenSource?.Dispose();
+        _disposed = true;
     }
 }

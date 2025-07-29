@@ -1,4 +1,5 @@
 using ChubDownloader.Models;
+using ChubDownloader.Infrastructure.Logging;
 
 namespace ChubDownloader.Views;
 
@@ -8,7 +9,7 @@ public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay,
         
         public void Start()
         {
-            Console.WriteLine("=== Chub.ai Characters JSON Downloader ===");
+            StringBuilderLogger.WriteLine("=== Chub.ai Characters JSON Downloader ===");
             
             var mode = GetDownloadModeWithValidation();
             var args = new DownloadEventArgs { Mode = mode };
@@ -34,10 +35,10 @@ public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay,
         {
             while (true)
             {
-                Console.WriteLine("\nВыберите режим работы:");
-                Console.WriteLine("1. Скачать персонажей из лидерборда (followers)");
-                Console.WriteLine("2. Скачать персонажей с обычных страниц (по сегментам)");
-                Console.WriteLine("3. Скачать персонажей с основной страницы персонажей");
+                StringBuilderLogger.WriteLine("\nВыберите режим работы:");
+                StringBuilderLogger.WriteLine("1. Скачать персонажей из лидерборда (followers)");
+                StringBuilderLogger.WriteLine("2. Скачать персонажей с обычных страниц (по сегментам)");
+                StringBuilderLogger.WriteLine("3. Скачать персонажей с основной страницы персонажей");
                 Console.Write("\nВаш выбор (1, 2 или 3): ");
                 
                 var choice = Console.ReadLine()?.Trim();
@@ -51,7 +52,7 @@ public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay,
                     case "3":
                         return DownloadMode.CharactersPages;
                     default:
-                        Console.WriteLine("❌ Неверный выбор! Пожалуйста, введите 1, 2 или 3.");
+                        StringBuilderLogger.LogError("Неверный выбор! Пожалуйста, введите 1, 2 или 3.");
                         continue;
                 }
             }
@@ -61,12 +62,12 @@ public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay,
         {
             while (true)
             {
-                Console.WriteLine("\nВыберите сегмент:");
-                Console.WriteLine("1. Quality (качественные персонажи)");
-                Console.WriteLine("2. Newcomer (новые персонажи)");
-                Console.WriteLine("3. Trending (популярные)");
-                Console.WriteLine("4. Timeline (временная лента)");
-                Console.WriteLine("5. Evergreen (вечнозеленые)");
+                StringBuilderLogger.WriteLine("\nВыберите сегмент:");
+                StringBuilderLogger.WriteLine("1. Quality (качественные персонажи)");
+                StringBuilderLogger.WriteLine("2. Newcomer (новые персонажи)");
+                StringBuilderLogger.WriteLine("3. Trending (популярные)");
+                StringBuilderLogger.WriteLine("4. Timeline (временная лента)");
+                StringBuilderLogger.WriteLine("5. Evergreen (вечнозеленые)");
                 Console.Write("\nВаш выбор (1-5): ");
                 
                 var choice = Console.ReadLine()?.Trim();
@@ -84,7 +85,7 @@ public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay,
                     case "5":
                         return Segment.Evergreen;
                     default:
-                        Console.WriteLine("❌ Неверный выбор! Пожалуйста, введите число от 1 до 5.");
+                        StringBuilderLogger.LogError("Неверный выбор! Пожалуйста, введите число от 1 до 5.");
                         continue;
                 }
             }
@@ -99,7 +100,7 @@ public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay,
                 
                 if (string.IsNullOrEmpty(input))
                 {
-                    Console.WriteLine("❌ Пожалуйста, введите число.");
+                    StringBuilderLogger.LogError("Пожалуйста, введите число.");
                     continue;
                 }
                 
@@ -107,16 +108,16 @@ public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay,
                 {
                     if (minChats == 0)
                     {
-                        Console.WriteLine("✅ Будут скачиваться все персонажи без ограничений по чатам.");
+                        StringBuilderLogger.WriteSuccess("Будут скачиваться все персонажи без ограничений по чатам.");
                     }
                     else
                     {
-                        Console.WriteLine($"✅ Будут скачиваться персонажи с количеством чатов от {minChats:N0}.");
+                        StringBuilderLogger.WriteFormattedLine("✅ Будут скачиваться персонажи с количеством чатов от {0:N0}.", minChats);
                     }
                     return minChats;
                 }
                 
-                Console.WriteLine("❌ Неверный формат! Пожалуйста, введите целое число больше или равное 0.");
+                StringBuilderLogger.LogError("Неверный формат! Пожалуйста, введите целое число больше или равное 0.");
             }
         }
         
@@ -129,17 +130,17 @@ public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay,
                 
                 if (string.IsNullOrEmpty(input))
                 {
-                    Console.WriteLine("❌ Пожалуйста, введите число.");
+                    StringBuilderLogger.LogError("Пожалуйста, введите число.");
                     continue;
                 }
                 
                 if (int.TryParse(input, out int startPage) && startPage >= 1)
                 {
-                    Console.WriteLine($"✅ Начинаем сканирование с страницы {startPage}.");
+                    StringBuilderLogger.WriteFormattedLine("✅ Начинаем сканирование с страницы {0}.", startPage);
                     return startPage;
                 }
                 
-                Console.WriteLine("❌ Неверный формат! Пожалуйста, введите целое число больше 0.");
+                StringBuilderLogger.LogError("Неверный формат! Пожалуйста, введите целое число больше 0.");
             }
         }
         
@@ -152,33 +153,33 @@ public sealed class ConsoleView : IMainView, IUserInteraction, IProgressDisplay,
                 
                 if (string.IsNullOrEmpty(input))
                 {
-                    Console.WriteLine("❌ Пожалуйста, введите число.");
+                    StringBuilderLogger.LogError("Пожалуйста, введите число.");
                     continue;
                 }
                 
                 if (int.TryParse(input, out int pagesToScan) && pagesToScan >= 1)
                 {
-                    Console.WriteLine($"✅ Будет просканировано {pagesToScan} страниц.");
+                    StringBuilderLogger.WriteFormattedLine("✅ Будет просканировано {0} страниц.", pagesToScan);
                     return pagesToScan;
                 }
                 
-                Console.WriteLine("❌ Неверный формат! Пожалуйста, введите целое число больше 0.");
+                StringBuilderLogger.LogError("Неверный формат! Пожалуйста, введите целое число больше 0.");
             }
         }
         
         public void ShowMessage(string message)
         {
-            Console.WriteLine($"✅ {message}");
+            StringBuilderLogger.WriteSuccess(message);
         }
         
         public void ShowError(string error)
         {
-            Console.WriteLine($"❌ [ERROR] {error}");
+            StringBuilderLogger.LogError(error);
         }
         
         public void UpdateProgress(string progress)
         {
-            Console.WriteLine($"📊 {progress}");
+            StringBuilderLogger.WriteProgress(progress);
         }
         
         public void SetEnabled(bool enabled)
